@@ -26,6 +26,7 @@
             <li><a href="#" class="nav-link active spawn-balloon" data-sport="wally"><span class="nav-icon">🏐</span> WALLY ARENA</a></li>
             <li><a href="#" class="nav-link spawn-balloon" data-sport="futsal"><span class="nav-icon">⚽</span> FUTSAL PRO</a></li>
             <li><a href="#" class="nav-link spawn-balloon" data-sport="voley"><span class="nav-icon">🏐</span> VÓLEY MASTER</a></li>
+            <li><a href="#" class="nav-link spawn-balloon" data-sport="buscador"><span class="nav-icon">🔎</span> BUSCADOR</a></li>
         </ul>
         <button id="theme-toggle" class="theme-btn spawn-balloon">🌙 Modo Oscuro</button>
     </header>
@@ -122,11 +123,6 @@
 
                         <div class="carousel" data-carousel="wally" aria-label="Galería wally">
                             <div class="carousel-track">
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/A.jpeg" alt="Cancha A" width="400" height="220"><figcaption>Cancha A</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/B.jpeg" alt="Cancha B" width="400" height="220"><figcaption>Cancha B</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/C.jpeg" alt="Cancha C" width="400" height="220"><figcaption>Cancha C</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Vista general" width="400" height="220"><figcaption>Vista general</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/A.jpeg" alt="Zona de juego" width="400" height="220"><figcaption>Zona de juego</figcaption></figure>
                             </div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
@@ -238,11 +234,6 @@
 
                         <div class="carousel" data-carousel="futsal" aria-label="Galería futsal">
                             <div class="carousel-track">
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Arena futsal" width="400" height="220"><figcaption>Arena futsal</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/B.jpeg" alt="Cancha lateral" width="400" height="220"><figcaption>Cancha lateral</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/A.jpeg" alt="Iluminación LED" width="400" height="220"><figcaption>Iluminación LED</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/C.jpeg" alt="Zona de espera" width="400" height="220"><figcaption>Zona de espera</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Vista completa" width="400" height="220"><figcaption>Vista completa</figcaption></figure>
                             </div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
@@ -350,11 +341,6 @@
 
                         <div class="carousel" data-carousel="voley" aria-label="Galería voley">
                             <div class="carousel-track">
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/C.jpeg" alt="Cancha de vóley" width="400" height="220"><figcaption>Cancha de vóley</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Vista general" width="400" height="220"><figcaption>Vista general</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/A.jpeg" alt="Red y postes" width="400" height="220"><figcaption>Red y postes</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/B.jpeg" alt="Zona de juego" width="400" height="220"><figcaption>Zona de juego</figcaption></figure>
-                            <figure class="carousel-slide"><img loading="lazy" src="img/vol/C.jpeg" alt="Gradas" width="400" height="220"><figcaption>Gradas</figcaption></figure>
                             </div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
@@ -410,9 +396,38 @@
             </div>
         </section>
 
+
+        <!-- ================= SECCIÓN BUSCADOR (estilo Google Imágenes) ================= -->
+        <section id="buscador" class="content-section" style="display: none;">
+            <div class="dashboard-card glass-panel buscador-card">
+                <form class="gs-bar" id="gs-form" role="search" autocomplete="off">
+                    <span class="gs-icon" aria-hidden="true">🔎</span>
+                    <input type="search" id="gs-input" placeholder="Busca: wally, voleibol, fútbol…" aria-label="Buscar imágenes">
+                    <button type="submit" class="gs-go">Buscar</button>
+                </form>
+
+                <div class="gs-tabs" id="gs-tabs" role="tablist">
+                    <button type="button" class="gs-tab active" data-cat="all">Todo</button>
+                    <button type="button" class="gs-tab" data-cat="wally">🏐 Wally</button>
+                    <button type="button" class="gs-tab" data-cat="voley">🏐 Voleibol</button>
+                    <button type="button" class="gs-tab" data-cat="futsal">⚽ Fútbol</button>
+                </div>
+
+                <div class="gs-scroll">
+                    <aside id="gs-knowledge" class="gs-knowledge" hidden></aside>
+                    <p id="gs-count" class="gs-count"></p>
+                    <p id="gs-credit" class="gs-credit" hidden></p>
+                    <div id="gs-grid" class="gs-grid" aria-live="polite"></div>
+                    <p id="gs-empty" class="gs-empty" hidden>Sin resultados. Prueba con “wally”, “voleibol” o “fútbol”.</p>
+                </div>
+            </div>
+        </section>
+
     </main>
 
+    <script src="carousel-data.js"></script>
     <script src="script.js"></script>
+    <script src="buscador.js"></script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', function () {

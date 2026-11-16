@@ -332,7 +332,21 @@ $(document).ready(function() {
 (function () {
     document.querySelectorAll('.carousel').forEach(function (car) {
         var track = car.querySelector('.carousel-track');
-        var total = car.querySelectorAll('.carousel-slide').length;
+        var imgs = (window.CAROUSEL_IMAGES || {})[car.dataset.carousel] || [];
+        imgs.forEach(function (it) {
+            var fig = document.createElement('figure');
+            fig.className = 'carousel-slide';
+            var im = document.createElement('img');
+            im.loading = 'lazy'; im.width = 800; im.height = 440; im.alt = it.alt;
+            im.referrerPolicy = 'no-referrer';
+            im.onerror = function () { im.onerror = null; im.src = it.local; };  // respaldo local
+            im.src = it.url || it.local;
+            var cap = document.createElement('figcaption');
+            cap.textContent = it.alt;
+            fig.appendChild(im); fig.appendChild(cap);
+            track.appendChild(fig);
+        });
+        var total = imgs.length;
         var dots = car.querySelector('.carousel-dots');
         var i = 0, timer = null, startX = null;
 
