@@ -212,13 +212,9 @@ $(document).ready(function() {
         $('#lbl-cancha-wally').text(letraCancha);
         $('#input-precio-wally').val(precioCancha);
 
+        // Todas las canchas se mantienen visibles; sólo se actualiza la seleccionada
         $('.cancha-chip').removeClass('selected');
         $(this).addClass('selected');
-
-        if (window.innerWidth > 768) {
-            $('.cancha-chip').not(this).addClass('hidden');
-            $('#btn-ver-todas-wally').fadeIn(150);
-        }
 
         sincronizarVistaWally();
     });

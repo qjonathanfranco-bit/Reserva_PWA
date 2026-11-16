@@ -89,7 +89,10 @@ body {
     overflow-y: auto;
     position: relative;
     transition: background-color 0.3s ease, color 0.3s ease;
-    padding-bottom: env(safe-area-inset-bottom, 14px);
+    padding-left: max(0px, env(safe-area-inset-left));
+    padding-right: max(0px, env(safe-area-inset-right));
+    padding-top: max(0px, env(safe-area-inset-top));
+    padding-bottom: max(14px, env(safe-area-inset-bottom));
 }
 
 /* EFECTO DE GLOBOS FLOTANTES */
@@ -122,7 +125,7 @@ body {
 .ios-install-banner {
     background: linear-gradient(135deg, #1e293b, #0f172a);
     border-bottom: 2px solid var(--active-accent);
-    padding: 10px 16px;
+    padding: 8px 16px;
     color: #f8fafc;
     font-size: 13px;
     position: sticky;
@@ -152,18 +155,18 @@ body {
     background: rgba(255, 255, 255, 0.15);
     border: none;
     color: white;
-    width: 28px;
-    height: 28px;
+    width: 26px;
+    height: 26px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
 }
 
-/* NAVBAR RESPONSIVA */
+/* NAVBAR RESPONSIVA (HORIZONTAL Y VERTICAL) */
 .navbar-compact {
     position: sticky;
     top: 0;
@@ -175,10 +178,11 @@ body {
     background: var(--card-bg);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
-    padding: 8px 16px;
+    padding: 8px max(16px, env(safe-area-inset-right)) 8px max(16px, env(safe-area-inset-left));
     border-bottom: 2px solid var(--active-accent);
     box-shadow: 0 4px 15px var(--active-glow);
     transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    gap: 10px;
 }
 
 .nav-brand-row {
@@ -186,10 +190,11 @@ body {
     align-items: center;
     justify-content: space-between;
     gap: 12px;
+    flex-shrink: 0;
 }
 
 .logo { 
-    font-size: 17px; 
+    font-size: 16px; 
     font-weight: 900; 
     white-space: nowrap;
     letter-spacing: 0.5px;
@@ -211,11 +216,13 @@ body {
     display: flex;
     align-items: center;
     gap: 8px;
+    flex-shrink: 0;
 }
 
 .nav-tabs-wrapper {
     display: flex;
     align-items: center;
+    min-width: 0;
 }
 
 .nav-list { 
@@ -224,6 +231,7 @@ body {
     gap: 6px; 
     margin: 0; 
     padding: 0; 
+    align-items: center;
 }
 
 .nav-link { 
@@ -241,6 +249,7 @@ body {
     gap: 5px;
     white-space: nowrap;
     cursor: pointer;
+    flex-shrink: 0;
 }
 .nav-link:hover { color: var(--text-color); background: rgba(255, 255, 255, 0.08); }
 .nav-link.active { 
@@ -266,6 +275,7 @@ body {
     display: inline-flex;
     align-items: center;
     gap: 4px;
+    flex-shrink: 0;
 }
 .pwa-install-btn:hover {
     transform: translateY(-1px);
@@ -287,6 +297,7 @@ body {
     align-items: center;
     gap: 4px;
     transition: all 0.2s;
+    flex-shrink: 0;
 }
 .theme-btn:hover {
     border-color: var(--active-accent);
@@ -298,7 +309,7 @@ body {
     min-height: calc(100vh - 56px);
     min-height: calc(100dvh - 56px);
     height: auto;
-    padding: 14px 12px 28px;
+    padding: 12px max(12px, env(safe-area-inset-right)) 28px max(12px, env(safe-area-inset-left));
     display: flex;
     justify-content: center;
     align-items: flex-start;
@@ -316,16 +327,16 @@ body {
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-radius: 14px;
-    padding: 16px;
+    padding: 14px;
     display: flex;
     flex-direction: column;
-    gap: 14px;
+    gap: 12px;
     border: 1px solid var(--glass-border);
     box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
     height: auto;
 }
 
-/* TOP ROW */
+/* TOP ROW: CANCHAS Y TIMER (SIN BOTONES DESAPARECIDOS NI CORTADOS) */
 .top-row {
     display: flex;
     justify-content: space-between;
@@ -334,22 +345,25 @@ body {
     padding: 8px 12px;
     border-radius: 12px;
     border: 1px solid var(--border-color);
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
+    width: 100%;
 }
 
 .canchas-row-wrapper {
     display: flex;
     align-items: center;
-    gap: 10px;
-    flex: 1;
+    gap: 8px;
+    flex: 1 1 auto;
     min-width: 0;
+    flex-wrap: wrap;
 }
 
 .canchas-row { 
     display: flex; 
     gap: 8px; 
     flex-wrap: wrap;
+    align-items: center;
 }
 
 .cancha-chip {
@@ -364,15 +378,16 @@ body {
     transition: all 0.2s ease;
     user-select: none;
     min-height: 42px;
+    flex: 0 1 auto;
+    white-space: nowrap;
 }
 
 .cancha-chip:hover { border-color: var(--active-accent); }
 .cancha-chip.selected { 
     border-color: var(--active-accent); 
-    background: rgba(255, 255, 255, 0.05); 
+    background: rgba(255, 255, 255, 0.06); 
     box-shadow: 0 0 14px var(--active-glow); 
 }
-.cancha-chip.hidden { display: none !important; }
 
 /* MINIATURAS */
 .chip-avatar { 
@@ -380,6 +395,8 @@ body {
     width: 38px; 
     height: 30px; 
     flex-shrink: 0;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
 }
 .chip-img { 
     width: 38px; 
@@ -414,17 +431,7 @@ body {
 }
 
 .btn-ver-todas {
-    background: var(--active-gradient);
-    color: white;
-    border: none;
-    padding: 7px 12px;
-    border-radius: 8px;
-    font-weight: 800;
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'Rajdhani', sans-serif;
-    letter-spacing: 0.5px;
-    white-space: nowrap;
+    display: none !important; /* Todas las canchas siempre visibles */
 }
 
 /* HEADER FUTSAL / VÓLEY */
@@ -457,7 +464,8 @@ body {
     display: flex; 
     align-items: center; 
     gap: 8px; 
-    flex-wrap: wrap;
+    flex-shrink: 0;
+    margin-left: auto;
 }
 
 .status-pill {
@@ -467,6 +475,7 @@ body {
     font-weight: 800;
     display: inline-flex;
     align-items: center;
+    white-space: nowrap;
 }
 .status-pill.disponible { 
     background: rgba(16, 185, 129, 0.15); 
@@ -483,23 +492,25 @@ body {
     background: rgba(245, 158, 11, 0.15);
     border: 1px solid rgba(245, 158, 11, 0.4);
     color: #f59e0b;
-    padding: 5px 10px;
+    padding: 6px 12px;
     border-radius: 8px;
     font-size: 11px;
     font-weight: 800;
     cursor: pointer;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .timer-mini-display {
     background: rgba(245, 158, 11, 0.2);
     color: #f59e0b;
     border: 1px solid #f59e0b;
-    padding: 4px 8px;
+    padding: 5px 10px;
     border-radius: 8px;
     font-size: 11px;
     font-weight: 800;
     white-space: nowrap;
+    flex-shrink: 0;
 }
 
 /* GRID PRINCIPAL RESPONSIVO */
@@ -519,7 +530,6 @@ body {
     flex-direction: column;
     gap: 12px;
     min-width: 0;
-    overflow: hidden;
     height: auto;
 }
 
@@ -588,6 +598,7 @@ body {
     font-family: 'Rajdhani', sans-serif;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 .btn-modo.active { 
     background: var(--active-gradient); 
@@ -609,7 +620,7 @@ body {
 .field-mini input, .field-mini-block input, .input-group-mini input {
     width: 100%;
     padding: 8px 10px;
-    font-size: 14px;
+    font-size: 15px;
     border: 1px solid var(--border-color);
     background: var(--card-bg);
     color: var(--text-color);
@@ -669,6 +680,7 @@ body {
     font-size: 14px;
     cursor: pointer;
     transition: transform 0.1s;
+    flex-shrink: 0;
 }
 .input-group-mini button:active {
     transform: scale(0.95);
@@ -809,6 +821,7 @@ body {
     font-size: 11px;
     cursor: pointer;
     transition: all 0.2s;
+    white-space: nowrap;
 }
 .pay-btn-mini.active-pay { 
     background: rgba(99, 102, 241, 0.25); 
@@ -852,6 +865,7 @@ body {
     cursor: pointer;
     margin-top: 4px;
     transition: background-color 0.2s;
+    white-space: nowrap;
 }
 .confirm-btn-mini:hover { background: #059669; }
 
@@ -882,7 +896,7 @@ body {
     position: relative;
     width: 100%;
     height: 170px;
-    min-height: 150px;
+    min-height: 140px;
     max-height: 220px;
     overflow: hidden;
     border-radius: 10px;
@@ -927,7 +941,7 @@ body {
     gap: 12px; 
     width: 100%; 
     height: auto; 
-    min-height: 550px; 
+    min-height: 520px; 
     overflow: visible; 
 }
 .gs-bar {
@@ -979,32 +993,16 @@ body {
 ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
 
 /* ======================================================= */
-/* MEDIA QUERIES RESPONSIVAS PARA TODO DISPOSITIVO         */
+/* ADAPTACIÓN UNIVERSAL: HORIZONTAL (LANDSCAPE) Y CELULAR  */
 /* ======================================================= */
 
-/* TABLETS Y PANTALLAS MEDIANAS (<= 992px) */
-@media (max-width: 992px) {
-    .grid-layout {
-        grid-template-columns: 1fr;
-        gap: 16px;
-    }
-
-    .scroll-list-wrapper {
-        max-height: 200px;
-    }
-
-    .carousel {
-        height: 190px;
-    }
-}
-
-/* CELULARES (<= 768px) */
-@media (max-width: 768px) {
+/* DISPOSITIVOS HASTA 1080px O EN MODO HORIZONTAL (LANDSCAPE) */
+@media (max-width: 1080px), (orientation: landscape) and (max-height: 650px) {
     .navbar-compact {
         flex-direction: column;
         align-items: stretch;
-        padding: 8px 12px;
-        gap: 8px;
+        padding: 6px max(12px, env(safe-area-inset-right)) 6px max(12px, env(safe-area-inset-left));
+        gap: 6px;
     }
 
     .nav-brand-row {
@@ -1023,7 +1021,7 @@ body {
     }
 
     .pwa-install-btn, .theme-btn {
-        padding: 5px 8px;
+        padding: 5px 10px;
         font-size: 11px;
     }
 
@@ -1032,47 +1030,115 @@ body {
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
         scrollbar-width: none;
-        padding-bottom: 2px;
+        padding: 2px 0 4px 0;
     }
     .nav-tabs-wrapper::-webkit-scrollbar {
         display: none;
     }
 
     .nav-list {
-        width: 100%;
+        width: max-content;
+        min-width: 100%;
         display: flex;
-        justify-content: space-between;
-        gap: 4px;
+        gap: 6px;
+        padding-right: 14px; /* Evita que el último botón se corte a la mitad */
     }
 
     .nav-link {
-        flex: 1;
-        justify-content: center;
-        padding: 7px 6px;
-        font-size: 11px;
-        text-align: center;
-    }
-
-    .dashboard-wrapper {
-        padding: 8px 6px 24px;
-    }
-
-    .glass-panel {
-        padding: 12px;
-        border-radius: 12px;
-        gap: 12px;
+        flex-shrink: 0;
+        white-space: nowrap;
+        padding: 6px 12px;
+        font-size: 11.5px;
     }
 
     .top-row {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        padding: 8px 10px;
+        gap: 8px;
     }
 
-    .canchas-row-wrapper {
-        width: 100%;
-        justify-content: space-between;
+    .timer-corner-box {
+        margin-left: auto;
+    }
+}
+
+/* TABLETS Y CELULARES EN VERTICAL (PORTRAIT <= 992px) */
+@media (max-width: 992px) and (orientation: portrait) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .scroll-list-wrapper {
+        max-height: 200px;
+    }
+}
+
+/* CELULARES EN MODO HORIZONTAL (LANDSCAPE - ALTURA CORTA) */
+@media (orientation: landscape) and (max-height: 600px) {
+    .navbar-compact {
+        padding: 4px max(12px, env(safe-area-inset-right)) 4px max(12px, env(safe-area-inset-left));
+        gap: 4px;
+    }
+
+    .logo {
+        font-size: 13.5px;
+    }
+
+    .nav-link {
+        padding: 5px 9px;
+        font-size: 10.5px;
+    }
+
+    .dashboard-wrapper {
+        padding-top: 6px;
+        padding-bottom: 20px;
+    }
+
+    .glass-panel {
+        padding: 10px 12px;
+        gap: 10px;
+    }
+
+    /* En horizontal divide en columnas proporcionadas que caben sin cortarse */
+    .grid-layout {
+        grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
+        gap: 10px;
+    }
+
+    .carousel {
+        height: 140px;
+        min-height: 120px;
+    }
+
+    .scroll-list-wrapper {
+        max-height: 150px;
+    }
+
+    .cancha-chip {
+        padding: 4px 8px;
+        min-height: 38px;
+    }
+
+    .chip-avatar {
+        width: 32px;
+        height: 26px;
+    }
+    .chip-img {
+        width: 32px;
+        height: 26px;
+    }
+
+    .btn-timer-mini, .timer-mini-display {
+        padding: 4px 8px;
+        font-size: 10.5px;
+    }
+}
+
+/* CELULARES EN VERTICAL ESTRECHOS (<= 600px) */
+@media (max-width: 600px) and (orientation: portrait) {
+    .top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 8px;
     }
 
     .canchas-row {
@@ -1084,34 +1150,13 @@ body {
     .cancha-chip {
         flex: 1 1 30%;
         padding: 5px 6px;
-        gap: 6px;
         justify-content: center;
-    }
-
-    .chip-avatar {
-        width: 34px;
-        height: 28px;
-    }
-    .chip-img {
-        width: 34px;
-        height: 28px;
-    }
-
-    .chip-info strong {
-        font-size: 11px;
-    }
-    .chip-info small {
-        font-size: 9px;
     }
 
     .timer-corner-box {
         width: 100%;
         justify-content: space-between;
-    }
-
-    /* En celulares iOS evitar auto-zoom manteniendo inputs legibles */
-    .field-mini input, .field-mini-block input, .input-group-mini input {
-        font-size: 16px;
+        margin-left: 0;
     }
 
     .slots-grid {
@@ -1129,45 +1174,23 @@ body {
         gap: 6px;
     }
 
-    .btn-hidra {
-        padding: 6px 8px;
-        font-size: 10.5px;
-    }
-
-    .carousel {
-        height: 160px;
-    }
-
     .btn-finalizar-reserva-mini {
         min-height: 48px;
         font-size: 14px;
     }
-
-    .gs-panel { 
-        flex-direction: column; 
-    }
-    .gs-side { 
-        padding-right: 0; 
-    }
-    .gs-grid { 
-        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); 
-    }
 }
 
-/* CELULARES MUY PEQUEÑOS (<= 420px) */
-@media (max-width: 420px) {
+/* CELULARES MUY PEQUEÑOS (<= 380px) */
+@media (max-width: 380px) {
     .btn-text, .theme-text {
         display: none;
     }
     .pwa-install-btn, .theme-btn {
-        padding: 6px 10px;
+        padding: 5px 8px;
     }
     .nav-link {
         font-size: 10px;
-        padding: 6px 4px;
-    }
-    .cancha-chip {
-        padding: 4px;
+        padding: 5px 4px;
     }
     .hidratacion-grid {
         grid-template-columns: 1fr;
