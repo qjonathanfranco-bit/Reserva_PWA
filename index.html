@@ -2,34 +2,1213 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover">
     <title>DeporZone - Arena Gaming Hub</title>
-    <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#6366f1">
+    
+    <!-- Meta tags para PWA y Móviles -->
+    <meta name="description" content="DeporZone Arena Gaming Hub - Reserva de canchas de Wally, Futsal y Vóley">
+    <meta name="theme-color" content="#030712" id="meta-theme-color">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="DeporZone">
-    <link rel="icon" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" href="icons/icon-192.png">
+    <meta name="format-detection" content="telephone=no">
+
+    <!-- Iconos y Manifest PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icons/icon-512.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+
+    <!-- Hojas de Estilos y Fuentes -->
+    <style>
+:root {
+    --bg-color: #030712;
+    --card-bg: rgba(15, 23, 42, 0.92);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --text-color: #f8fafc;
+    --text-muted: #94a3b8;
+    --box-bg: rgba(30, 41, 59, 0.65);
+    --border-color: rgba(255, 255, 255, 0.08);
+
+    --accent-wally: #38bdf8;
+    --wally-gradient: linear-gradient(135deg, #0284c7, #38bdf8);
+    --wally-glow: rgba(56, 189, 248, 0.35);
+
+    --accent-futsal: #4ade80;
+    --futsal-gradient: linear-gradient(135deg, #16a34a, #4ade80);
+    --futsal-glow: rgba(74, 222, 128, 0.35);
+
+    --accent-voley: #fbbf24;
+    --voley-gradient: linear-gradient(135deg, #d97706, #fbbf24);
+    --voley-glow: rgba(251, 191, 36, 0.35);
+
+    --active-accent: var(--accent-wally);
+    --active-gradient: var(--wally-gradient);
+    --active-glow: var(--wally-glow);
+}
+
+/* MODO CLARO */
+body.light-theme {
+    --bg-color: #f1f5f9;
+    --card-bg: rgba(255, 255, 255, 0.96);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --text-color: #0f172a;
+    --text-muted: #64748b;
+    --box-bg: rgba(248, 250, 252, 0.95);
+    --border-color: rgba(0, 0, 0, 0.1);
+}
+
+body.theme-wally { --active-accent: var(--accent-wally); --active-gradient: var(--wally-gradient); --active-glow: var(--wally-glow); }
+body.theme-futsal { --active-accent: var(--accent-futsal); --active-gradient: var(--futsal-gradient); --active-glow: var(--futsal-glow); }
+body.theme-voley { --active-accent: var(--accent-voley); --active-gradient: var(--voley-gradient); --active-glow: var(--voley-glow); }
+body.theme-buscador { --active-accent: #818cf8; --active-gradient: linear-gradient(135deg, #4f46e5, #818cf8); --active-glow: rgba(129, 140, 248, 0.35); }
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html {
+    font-size: 16px;
+    height: 100%;
+}
+
+body {
+    font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background-color: var(--bg-color);
+    background-image: 
+        radial-gradient(circle at 10% 10%, var(--active-glow) 0px, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(99, 102, 241, 0.12) 0px, transparent 50%);
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: relative;
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding-bottom: env(safe-area-inset-bottom, 14px);
+}
+
+/* EFECTO DE GLOBOS FLOTANTES */
+.floating-balloon {
+    position: fixed;
+    pointer-events: none;
+    font-size: 22px;
+    user-select: none;
+    z-index: 9999;
+    will-change: transform, opacity;
+    animation: balloonFloat 1.2s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+
+@keyframes balloonFloat {
+    0% {
+        opacity: 1;
+        transform: translate(-50%, -50%) scale(0.6) translateY(0);
+    }
+    50% {
+        opacity: 0.9;
+        transform: translate(-50%, -50%) scale(1.15) translateY(-35px);
+    }
+    100% {
+        opacity: 0;
+        transform: translate(-50%, -50%) scale(0.85) translateY(-80px);
+    }
+}
+
+/* BANNER AUXILIAR PWA IOS */
+.ios-install-banner {
+    background: linear-gradient(135deg, #1e293b, #0f172a);
+    border-bottom: 2px solid var(--active-accent);
+    padding: 10px 16px;
+    color: #f8fafc;
+    font-size: 13px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+}
+
+.ios-banner-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.ios-banner-text {
+    line-height: 1.4;
+}
+
+.ios-banner-text strong {
+    color: var(--active-accent);
+}
+
+.btn-close-banner {
+    background: rgba(255, 255, 255, 0.15);
+    border: none;
+    color: white;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+/* NAVBAR RESPONSIVA */
+.navbar-compact {
+    position: sticky;
+    top: 0;
+    z-index: 900;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 8px 16px;
+    border-bottom: 2px solid var(--active-accent);
+    box-shadow: 0 4px 15px var(--active-glow);
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.nav-brand-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.logo { 
+    font-size: 17px; 
+    font-weight: 900; 
+    white-space: nowrap;
+    letter-spacing: 0.5px;
+}
+.logo span { color: var(--active-accent); }
+.beta-tag { 
+    font-size: 8px; 
+    background: var(--active-gradient); 
+    color: #fff; 
+    padding: 2px 5px; 
+    border-radius: 4px; 
+    vertical-align: middle; 
+    margin-left: 4px; 
+    font-family: 'Rajdhani', sans-serif; 
+    font-weight: 700;
+}
+
+.nav-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-tabs-wrapper {
+    display: flex;
+    align-items: center;
+}
+
+.nav-list { 
+    list-style: none; 
+    display: flex; 
+    gap: 6px; 
+    margin: 0; 
+    padding: 0; 
+}
+
+.nav-link { 
+    color: var(--text-muted); 
+    text-decoration: none; 
+    font-weight: 800; 
+    font-size: 12px; 
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    white-space: nowrap;
+    cursor: pointer;
+}
+.nav-link:hover { color: var(--text-color); background: rgba(255, 255, 255, 0.08); }
+.nav-link.active { 
+    color: #fff; 
+    background: var(--active-gradient); 
+    box-shadow: 0 3px 12px var(--active-glow); 
+}
+
+/* BOTONES DE ACCIÓN EN HEADER */
+.pwa-install-btn {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: 1px solid rgba(16, 185, 129, 0.4);
+    color: #ffffff;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.3);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+.pwa-install-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+}
+
+.theme-btn {
+    background: var(--box-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 11.5px;
+    font-weight: 800;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+.theme-btn:hover {
+    border-color: var(--active-accent);
+}
+
+/* LAYOUT GENERAL */
+.dashboard-wrapper {
+    width: 100%;
+    min-height: calc(100vh - 56px);
+    min-height: calc(100dvh - 56px);
+    height: auto;
+    padding: 14px 12px 28px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+.content-section { 
+    width: 100%; 
+    max-width: 1280px; 
+    margin: 0 auto;
+    height: auto;
+}
+
+.glass-panel {
+    background: var(--card-bg);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-radius: 14px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    border: 1px solid var(--glass-border);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.35);
+    height: auto;
+}
+
+/* TOP ROW */
+.top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--box-bg);
+    padding: 8px 12px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.canchas-row-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.canchas-row { 
+    display: flex; 
+    gap: 8px; 
+    flex-wrap: wrap;
+}
+
+.cancha-chip {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 6px 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    min-height: 42px;
+}
+
+.cancha-chip:hover { border-color: var(--active-accent); }
+.cancha-chip.selected { 
+    border-color: var(--active-accent); 
+    background: rgba(255, 255, 255, 0.05); 
+    box-shadow: 0 0 14px var(--active-glow); 
+}
+.cancha-chip.hidden { display: none !important; }
+
+/* MINIATURAS */
+.chip-avatar { 
+    position: relative; 
+    width: 38px; 
+    height: 30px; 
+    flex-shrink: 0;
+}
+.chip-img { 
+    width: 38px; 
+    height: 30px; 
+    object-fit: cover; 
+    border-radius: 6px; 
+    border: 1px solid var(--border-color); 
+}
+.badge-lvl {
+    position: absolute;
+    bottom: -3px;
+    right: -3px;
+    background: var(--active-gradient);
+    color: white;
+    font-size: 9px;
+    font-weight: 900;
+    padding: 1px 4px;
+    border-radius: 4px;
+}
+
+.chip-info strong { 
+    display: block; 
+    font-size: 12px; 
+    font-weight: 800; 
+    font-family: 'Rajdhani', sans-serif; 
+    white-space: nowrap;
+}
+.chip-info small { 
+    font-size: 10px; 
+    color: var(--text-muted); 
+    white-space: nowrap;
+}
+
+.btn-ver-todas {
+    background: var(--active-gradient);
+    color: white;
+    border: none;
+    padding: 7px 12px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 11px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+/* HEADER FUTSAL / VÓLEY */
+.single-cancha-header { 
+    display: flex; 
+    align-items: center; 
+    gap: 10px; 
+}
+.cancha-thumb { 
+    width: 48px; 
+    height: 36px; 
+    object-fit: cover; 
+    border-radius: 8px; 
+    border: 1px solid var(--border-color); 
+}
+.single-cancha-text strong { 
+    display: block; 
+    font-size: 13px; 
+    font-weight: 800; 
+    color: var(--active-accent); 
+    font-family: 'Rajdhani', sans-serif; 
+}
+.single-cancha-text small { 
+    font-size: 11px; 
+    color: var(--text-muted); 
+}
+
+/* STATUS Y TIMER */
+.timer-corner-box { 
+    display: flex; 
+    align-items: center; 
+    gap: 8px; 
+    flex-wrap: wrap;
+}
+
+.status-pill {
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 800;
+    display: inline-flex;
+    align-items: center;
+}
+.status-pill.disponible { 
+    background: rgba(16, 185, 129, 0.15); 
+    color: #10b981; 
+    border: 1px solid rgba(16, 185, 129, 0.3); 
+}
+.status-pill.ocupado { 
+    background: rgba(239, 68, 68, 0.15); 
+    color: #ef4444; 
+    border: 1px solid rgba(239, 68, 68, 0.3); 
+}
+
+.btn-timer-mini {
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    color: #f59e0b;
+    padding: 5px 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.timer-mini-display {
+    background: rgba(245, 158, 11, 0.2);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    white-space: nowrap;
+}
+
+/* GRID PRINCIPAL RESPONSIVO */
+.grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1.15fr 1fr;
+    gap: 14px;
+    width: 100%;
+}
+
+.col-section {
+    background: var(--box-bg);
+    border-radius: 12px;
+    padding: 14px;
+    border: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-width: 0;
+    overflow: hidden;
+    height: auto;
+}
+
+.col-title { 
+    font-family: 'Rajdhani', sans-serif;
+    margin: 0; 
+    font-size: 13px; 
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    text-transform: uppercase; 
+    color: var(--active-accent); 
+}
+
+.section-sublabel { 
+    display: block; 
+    font-size: 10px; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    margin-bottom: 4px; 
+    text-transform: uppercase; 
+}
+
+/* SLOTS HORARIOS */
+.horarios-container { margin: 2px 0; }
+.slots-grid { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: 6px; 
+}
+.slot-btn {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 8px 6px;
+    border-radius: 8px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.slot-btn:hover:not(:disabled) { border-color: var(--active-accent); }
+.slot-btn.active { 
+    background: var(--active-gradient); 
+    color: white; 
+    border-color: transparent; 
+    box-shadow: 0 2px 8px var(--active-glow);
+}
+.slot-btn.ocupado { opacity: 0.45; cursor: not-allowed; background: rgba(239, 68, 68, 0.1); }
+
+/* SELECTOR MODO */
+.modo-pago-selector { display: flex; gap: 6px; }
+.btn-modo {
+    flex: 1;
+    padding: 8px;
+    font-size: 11px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    border-radius: 8px;
+    font-weight: 800;
+    font-family: 'Rajdhani', sans-serif;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.btn-modo.active { 
+    background: var(--active-gradient); 
+    color: white; 
+    border-color: transparent; 
+    box-shadow: 0 2px 8px var(--active-glow);
+}
+
+.input-compact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.field-mini label, .field-mini-block label { 
+    display: block; 
+    font-size: 10px; 
+    font-weight: 700; 
+    color: var(--text-muted); 
+    margin-bottom: 3px; 
+}
+
+/* Inputs para evitar zoom forzado en iOS Safari */
+.field-mini input, .field-mini-block input, .input-group-mini input {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-color);
+    border-radius: 8px;
+    outline: none;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+    font-family: inherit;
+}
+.field-mini input:focus, .field-mini-block input:focus, .input-group-mini input:focus {
+    border-color: var(--active-accent);
+}
+
+.info-card-conjunto {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--active-accent);
+    padding: 10px;
+    border-radius: 8px;
+    font-size: 11px;
+    line-height: 1.4;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+.info-card-conjunto strong { color: var(--active-accent); }
+
+.summary-box {
+    background: var(--card-bg);
+    padding: 10px 12px;
+    border-radius: 8px;
+    font-size: 12px;
+    line-height: 1.5;
+    border-left: 3px solid var(--active-accent);
+}
+.summary-box p { margin: 3px 0; }
+.highlight-text { color: var(--active-accent); font-weight: 800; }
+
+/* JUGADORES */
+.col-header-flex { display: flex; justify-content: space-between; align-items: center; }
+.badge-count { 
+    font-size: 11px; 
+    background: rgba(255, 255, 255, 0.1); 
+    color: var(--active-accent); 
+    padding: 2px 8px; 
+    border-radius: 6px; 
+    font-weight: 800; 
+}
+
+.input-group-mini { display: flex; gap: 6px; }
+.input-group-mini input { flex: 1; }
+.input-group-mini button {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 14px;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+.input-group-mini button:active {
+    transform: scale(0.95);
+}
+
+.scroll-list-wrapper { 
+    max-height: 220px;
+    overflow-y: auto; 
+    padding-right: 4px; 
+    margin-top: 4px; 
+    -webkit-overflow-scrolling: touch;
+}
+.player-list-mini { list-style: none; padding: 0; margin: 0; }
+.player-list-mini li {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    padding: 8px 10px;
+    margin-bottom: 6px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 12px;
+    gap: 8px;
+    min-height: 42px;
+}
+
+.player-list-mini li > span {
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    flex: 1;
+    min-width: 0;
+}
+
+.player-action-btns {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+    align-items: center;
+}
+
+.btn-check-asistencia, .btn-check-pago {
+    padding: 5px 8px;
+    border-radius: 6px;
+    font-size: 11px;
+    font-weight: 800;
+    border: none;
+    cursor: pointer;
+    min-width: 32px;
+    min-height: 32px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-muted);
+    transition: all 0.2s;
+}
+.btn-check-asistencia.confirmado { background: #3b82f6; color: white; }
+.btn-check-pago.pagado { background: #10b981; color: white; }
+
+/* SELECTOR DE HIDRATACIÓN (SIN SOLAPAMIENTOS) */
+.hidratacion-container {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    margin-bottom: 4px;
+}
+.hidratacion-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+.btn-hidra {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 6px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    font-size: 11px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    transition: all 0.2s ease;
+    min-height: 40px;
+    white-space: nowrap;
+    overflow: hidden;
+}
+.btn-hidra:hover {
+    border-color: var(--active-accent);
+}
+.btn-hidra.active {
+    background: var(--active-gradient);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px var(--active-glow);
+}
+.btn-hidra .hidra-icon {
+    font-size: 12px;
+    flex-shrink: 0;
+}
+.btn-hidra .hidra-name {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 11px;
+}
+.btn-hidra .hidra-badge {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 2px 5px;
+    border-radius: 4px;
+    font-size: 9.5px;
+    font-weight: 800;
+    flex-shrink: 0;
+}
+.btn-hidra.active .hidra-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
+/* PASARELA */
+.payment-mini-options { display: flex; gap: 6px; }
+.pay-btn-mini {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid var(--border-color);
+    background: var(--card-bg);
+    color: var(--text-muted);
+    font-weight: 800;
+    border-radius: 8px;
+    font-size: 11px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.pay-btn-mini.active-pay { 
+    background: rgba(99, 102, 241, 0.25); 
+    color: #818cf8; 
+    border-color: #6366f1; 
+}
+
+.qr-box-mini {
+    background: var(--card-bg);
+    padding: 10px;
+    border-radius: 10px;
+    text-align: center;
+    border: 1px dashed rgba(99, 102, 241, 0.4);
+    margin-top: 4px;
+}
+.qr-code-placeholder-mini {
+    background: #ffffff;
+    color: #0f172a;
+    padding: 8px;
+    font-size: 10px;
+    font-weight: 900;
+    border-radius: 6px;
+    margin-bottom: 6px;
+}
+.qr-fake-art {
+    width: 36px;
+    height: 36px;
+    margin: 0 auto 4px auto;
+    background: repeating-linear-gradient(45deg, #0f172a, #0f172a 3px, #fff 3px, #fff 6px);
+    border-radius: 4px;
+}
+
+.confirm-btn-mini {
+    background: #10b981;
+    color: white;
+    border: none;
+    padding: 6px 12px;
+    font-size: 11px;
+    border-radius: 6px;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 4px;
+    transition: background-color 0.2s;
+}
+.confirm-btn-mini:hover { background: #059669; }
+
+.finalizar-container-mini { margin-top: auto; padding-top: 6px; }
+.btn-finalizar-reserva-mini {
+    width: 100%;
+    min-height: 48px;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    color: white;
+    border: none;
+    padding: 12px;
+    font-size: 14px;
+    font-weight: 900;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: 'Rajdhani', sans-serif;
+    letter-spacing: 1px;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.35);
+    transition: transform 0.1s, box-shadow 0.2s;
+    user-select: none;
+}
+.btn-finalizar-reserva-mini:active {
+    transform: scale(0.98);
+}
+
+/* CARRUSEL */
+.carousel {
+    position: relative;
+    width: 100%;
+    height: 170px;
+    min-height: 150px;
+    max-height: 220px;
+    overflow: hidden;
+    border-radius: 10px;
+    border: 1px solid var(--border-color);
+    background: #000;
+    touch-action: pan-y;
+    margin-top: 4px;
+}
+.carousel-track { display: flex; height: 100%; transition: transform 0.45s ease; }
+.carousel-slide { position: relative; flex: 0 0 100%; height: 100%; margin: 0; }
+.carousel-slide img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.carousel-slide figcaption {
+    position: absolute; left: 0; right: 0; bottom: 0;
+    padding: 18px 10px 6px;
+    font-size: 11px; font-weight: 700; color: #fff;
+    background: linear-gradient(transparent, rgba(0, 0, 0, 0.75));
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.carousel-btn {
+    position: absolute; top: 50%; transform: translateY(-50%);
+    width: 30px; height: 30px; border: 0; border-radius: 50%;
+    background: rgba(0, 0, 0, 0.65); color: #fff; cursor: pointer; font-size: 13px;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 10;
+}
+.carousel-btn:hover { background: var(--active-accent); }
+.carousel-btn.prev { left: 6px; }
+.carousel-btn.next { right: 6px; }
+.carousel-dots { position: absolute; bottom: 6px; right: 8px; display: flex; gap: 5px; z-index: 10; }
+.carousel-dots button {
+    width: 8px; height: 8px; padding: 0; border: 0; border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5); cursor: pointer;
+}
+.carousel-dots button.active { background: var(--active-accent); transform: scale(1.25); }
+
+/* BUSCADOR DE IMÁGENES */
+.buscador-card { 
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px; 
+    width: 100%; 
+    height: auto; 
+    min-height: 550px; 
+    overflow: visible; 
+}
+.gs-bar {
+    display: flex; align-items: center; gap: 8px; flex: 0 0 auto;
+    background: var(--box-bg); border: 1px solid var(--border-color);
+    border-radius: 999px; padding: 6px 8px 6px 14px;
+}
+.gs-bar:focus-within { border-color: var(--active-accent); box-shadow: 0 0 10px var(--active-glow); }
+.gs-bar input { flex: 1; min-width: 0; background: transparent; border: 0; outline: 0; color: var(--text-color); font: 600 14px 'Plus Jakarta Sans', sans-serif; padding: 6px 0; }
+.gs-go { border: 0; border-radius: 999px; background: var(--active-gradient); color: #fff; font: 800 12px 'Rajdhani', sans-serif; letter-spacing: .5px; padding: 8px 16px; cursor: pointer; white-space: nowrap; }
+
+.gs-tabs { display: flex; gap: 6px; flex: 0 0 auto; overflow-x: auto; padding-bottom: 4px; }
+.gs-tab { flex: 0 0 auto; border: 1px solid var(--border-color); background: var(--card-bg); color: var(--text-muted); border-radius: 999px; padding: 6px 14px; font: 800 11.5px 'Rajdhani', sans-serif; letter-spacing: .5px; cursor: pointer; white-space: nowrap; }
+.gs-tab.active { background: var(--active-gradient); color: #fff; border-color: transparent; }
+
+.gs-scroll { flex: 1; min-height: 0; overflow-y: auto; padding-right: 2px; }
+.gs-count { margin: 0 0 6px; font-size: 11px; color: var(--text-muted); font-weight: 700; }
+.gs-knowledge { background: var(--box-bg); border: 1px solid var(--border-color); border-left: 3px solid var(--active-accent); border-radius: 8px; padding: 10px 14px; margin-bottom: 10px; }
+.gs-knowledge h3 { margin: 0 0 4px; font-size: 15px; color: var(--active-accent); font-family: 'Rajdhani', sans-serif; }
+.gs-knowledge p { margin: 0; font-size: 12px; line-height: 1.5; color: var(--text-color); }
+
+.gs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.gs-thumb { position: relative; padding: 0; border: 1px solid var(--border-color); border-radius: 8px; overflow: hidden; background: var(--box-bg); cursor: zoom-in; aspect-ratio: 1 / 1; transition: transform .15s, box-shadow .15s; }
+.gs-thumb:hover { transform: scale(1.03); box-shadow: 0 0 10px var(--active-glow); }
+.gs-thumb.is-open { outline: 2px solid var(--active-accent); }
+.gs-thumb img { width: 100%; height: 100%; object-fit: cover; display: block; opacity: 0; transition: opacity .35s; }
+.gs-thumb.loaded img { opacity: 1; }
+.gs-cap { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 5px 3px; font: 700 9.5px 'Plus Jakarta Sans', sans-serif; color: #fff; text-align: left; background: linear-gradient(transparent, rgba(0,0,0,.75)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+.gs-panel { grid-column: 1 / -1; position: relative; display: flex; gap: 12px; padding: 12px; background: var(--box-bg); border: 1px solid var(--active-accent); border-radius: 10px; animation: gsOpen .25s ease; }
+@keyframes gsOpen { from { opacity: 0; transform: scale(.96); } to { opacity: 1; transform: none; } }
+.gs-big { flex: 1 1 60%; min-width: 0; max-height: 300px; border-radius: 8px; overflow: hidden; background: #000; cursor: pointer; display: block; }
+.gs-big img { width: 100%; height: 100%; max-height: 300px; object-fit: contain; display: block; }
+.gs-side { flex: 1 1 40%; display: flex; flex-direction: column; gap: 8px; justify-content: center; min-width: 0; padding-right: 22px; }
+.gs-side h4 { margin: 0; font-size: 15px; color: var(--text-color); }
+.gs-tag { align-self: flex-start; font: 800 10px 'Rajdhani', sans-serif; background: var(--active-gradient); color: #fff; padding: 2px 8px; border-radius: 999px; }
+.gs-size-lab { font-size: 10.5px; font-weight: 700; color: var(--text-muted); }
+.gs-size { background: var(--card-bg); color: var(--text-color); border: 1px solid var(--border-color); border-radius: 6px; padding: 5px 8px; font-size: 11.5px; }
+.gs-visit { display: inline-block; text-align: center; text-decoration: none; background: var(--active-gradient); color: #fff; font: 800 12px 'Rajdhani', sans-serif; letter-spacing: .5px; padding: 8px 12px; border-radius: 8px; }
+.gs-x { position: absolute; top: 6px; right: 6px; width: 26px; height: 26px; border: 0; border-radius: 50%; background: rgba(0,0,0,.6); color: #fff; cursor: pointer; font-size: 12px; display: flex; align-items: center; justify-content: center; }
+.gs-empty { text-align: center; color: var(--text-muted); font-size: 13px; padding: 24px 0; }
+.gs-credit { margin: 0 0 6px; font-size: 10px; color: var(--text-muted); }
+.gs-src { font-size: 10.5px; font-weight: 700; color: var(--active-accent); text-decoration: none; }
+.gs-src:hover { text-decoration: underline; }
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 4px; }
+
+/* ======================================================= */
+/* MEDIA QUERIES RESPONSIVAS PARA TODO DISPOSITIVO         */
+/* ======================================================= */
+
+/* TABLETS Y PANTALLAS MEDIANAS (<= 992px) */
+@media (max-width: 992px) {
+    .grid-layout {
+        grid-template-columns: 1fr;
+        gap: 16px;
+    }
+
+    .scroll-list-wrapper {
+        max-height: 200px;
+    }
+
+    .carousel {
+        height: 190px;
+    }
+}
+
+/* CELULARES (<= 768px) */
+@media (max-width: 768px) {
+    .navbar-compact {
+        flex-direction: column;
+        align-items: stretch;
+        padding: 8px 12px;
+        gap: 8px;
+    }
+
+    .nav-brand-row {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 15px;
+    }
+
+    .nav-actions {
+        gap: 6px;
+    }
+
+    .pwa-install-btn, .theme-btn {
+        padding: 5px 8px;
+        font-size: 11px;
+    }
+
+    .nav-tabs-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+    }
+    .nav-tabs-wrapper::-webkit-scrollbar {
+        display: none;
+    }
+
+    .nav-list {
+        width: 100%;
+        display: flex;
+        justify-content: space-between;
+        gap: 4px;
+    }
+
+    .nav-link {
+        flex: 1;
+        justify-content: center;
+        padding: 7px 6px;
+        font-size: 11px;
+        text-align: center;
+    }
+
+    .dashboard-wrapper {
+        padding: 8px 6px 24px;
+    }
+
+    .glass-panel {
+        padding: 12px;
+        border-radius: 12px;
+        gap: 12px;
+    }
+
+    .top-row {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 8px 10px;
+    }
+
+    .canchas-row-wrapper {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    .canchas-row {
+        width: 100%;
+        display: flex;
+        gap: 6px;
+    }
+
+    .cancha-chip {
+        flex: 1 1 30%;
+        padding: 5px 6px;
+        gap: 6px;
+        justify-content: center;
+    }
+
+    .chip-avatar {
+        width: 34px;
+        height: 28px;
+    }
+    .chip-img {
+        width: 34px;
+        height: 28px;
+    }
+
+    .chip-info strong {
+        font-size: 11px;
+    }
+    .chip-info small {
+        font-size: 9px;
+    }
+
+    .timer-corner-box {
+        width: 100%;
+        justify-content: space-between;
+    }
+
+    /* En celulares iOS evitar auto-zoom manteniendo inputs legibles */
+    .field-mini input, .field-mini-block input, .input-group-mini input {
+        font-size: 16px;
+    }
+
+    .slots-grid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 5px;
+    }
+
+    .slot-btn {
+        padding: 8px 4px;
+        font-size: 11px;
+    }
+
+    .hidratacion-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 6px;
+    }
+
+    .btn-hidra {
+        padding: 6px 8px;
+        font-size: 10.5px;
+    }
+
+    .carousel {
+        height: 160px;
+    }
+
+    .btn-finalizar-reserva-mini {
+        min-height: 48px;
+        font-size: 14px;
+    }
+
+    .gs-panel { 
+        flex-direction: column; 
+    }
+    .gs-side { 
+        padding-right: 0; 
+    }
+    .gs-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(88px, 1fr)); 
+    }
+}
+
+/* CELULARES MUY PEQUEÑOS (<= 420px) */
+@media (max-width: 420px) {
+    .btn-text, .theme-text {
+        display: none;
+    }
+    .pwa-install-btn, .theme-btn {
+        padding: 6px 10px;
+    }
+    .nav-link {
+        font-size: 10px;
+        padding: 6px 4px;
+    }
+    .cancha-chip {
+        padding: 4px;
+    }
+    .hidratacion-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+</style>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@600;700;800;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800;900&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
     <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
 </head>
 <body class="theme-wally">
 
-    <!-- Header Gaming Minimalista -->
+    <!-- Header Gaming Responsivo -->
     <header class="navbar-compact">
-        <div class="logo">⚡ <span>DEPOR</span>ZONE <small class="beta-tag">ARENA EVENT</small></div>
-        <ul class="nav-list">
-            <li><a href="#" class="nav-link active spawn-balloon" data-sport="wally"><span class="nav-icon">🏐</span> WALLY ARENA</a></li>
-            <li><a href="#" class="nav-link spawn-balloon" data-sport="futsal"><span class="nav-icon">⚽</span> FUTSAL PRO</a></li>
-            <li><a href="#" class="nav-link spawn-balloon" data-sport="voley"><span class="nav-icon">🏐</span> VÓLEY MASTER</a></li>
-            <li><a href="#" class="nav-link spawn-balloon" data-sport="buscador"><span class="nav-icon">🔎</span> BUSCADOR</a></li>
-        </ul>
-        <button id="theme-toggle" class="theme-btn spawn-balloon">🌙 Modo Oscuro</button>
+        <div class="nav-brand-row">
+            <div class="logo">⚡ <span>DEPOR</span>ZONE <small class="beta-tag">ARENA EVENT</small></div>
+            <div class="nav-actions">
+                <button id="pwa-install-btn" class="pwa-install-btn spawn-balloon" style="display:none;" title="Instalar aplicación en tu dispositivo">📲 <span class="btn-text">Instalar App</span></button>
+                <button id="theme-toggle" class="theme-btn spawn-balloon" aria-label="Cambiar tema">🌙 <span class="theme-text">Modo Oscuro</span></button>
+            </div>
+        </div>
+        <nav class="nav-tabs-wrapper" aria-label="Navegación de secciones">
+            <ul class="nav-list">
+                <li><a href="#wally" class="nav-link active spawn-balloon" data-sport="wally"><span class="nav-icon">🏐</span> WALLY ARENA</a></li>
+                <li><a href="#futsal" class="nav-link spawn-balloon" data-sport="futsal"><span class="nav-icon">⚽</span> FUTSAL PRO</a></li>
+                <li><a href="#voley" class="nav-link spawn-balloon" data-sport="voley"><span class="nav-icon">🏐</span> VÓLEY MASTER</a></li>
+                <li><a href="#buscador" class="nav-link spawn-balloon" data-sport="buscador"><span class="nav-icon">🔎</span> BUSCADOR</a></li>
+            </ul>
+        </nav>
     </header>
+
+    <!-- Banner auxiliar para instalación en iPhone / Safari -->
+    <div id="ios-pwa-banner" class="ios-install-banner" style="display: none;">
+        <div class="ios-banner-content">
+            <span class="ios-banner-text">📲 <strong>Instala la App en tu iPhone:</strong> pulsa <strong>Compartir</strong> ⎋ y luego <strong>"Agregar a pantalla de inicio"</strong> ➕</span>
+            <button id="btn-close-ios-banner" class="btn-close-banner" aria-label="Cerrar aviso">✕</button>
+        </div>
+    </div>
 
     <main class="dashboard-wrapper">
         
@@ -39,40 +1218,41 @@
                 
                 <!-- TOP ROW: Canchas -->
                 <div class="top-row">
-                    <div class="canchas-row" id="canchas-container-wally">
-                        <div class="cancha-chip selected spawn-balloon" data-cancha="A" data-precio="40">
-                            <div class="chip-avatar">
-                                <img loading="lazy" src="img/vol/A.jpeg" alt="Cancha A" class="chip-img">
-                                <span class="badge-lvl">A</span>
+                    <div class="canchas-row-wrapper">
+                        <div class="canchas-row" id="canchas-container-wally">
+                            <div class="cancha-chip selected spawn-balloon" data-cancha="A" data-precio="40">
+                                <div class="chip-avatar">
+                                    <img loading="lazy" src="img/vol/A.jpeg" alt="Cancha A" class="chip-img" onerror="this.style.display='none';">
+                                    <span class="badge-lvl">A</span>
+                                </div>
+                                <div class="chip-info">
+                                    <strong>CANCHA A</strong>
+                                    <small>40 Bs • Techada</small>
+                                </div>
                             </div>
-                            <div class="chip-info">
-                                <strong>CANCHA A</strong>
-                                <small>40 Bs • Techada</small>
+                            <div class="cancha-chip spawn-balloon" data-cancha="B" data-precio="45">
+                                <div class="chip-avatar">
+                                    <img loading="lazy" src="img/vol/B.jpeg" alt="Cancha B" class="chip-img" onerror="this.style.display='none';">
+                                    <span class="badge-lvl">B</span>
+                                </div>
+                                <div class="chip-info">
+                                    <strong>CANCHA B</strong>
+                                    <small>45 Bs • Blindex</small>
+                                </div>
+                            </div>
+                            <div class="cancha-chip spawn-balloon" data-cancha="C" data-precio="50">
+                                <div class="chip-avatar">
+                                    <img loading="lazy" src="img/vol/C.jpeg" alt="Cancha C" class="chip-img" onerror="this.style.display='none';">
+                                    <span class="badge-lvl">C</span>
+                                </div>
+                                <div class="chip-info">
+                                    <strong>CANCHA C</strong>
+                                    <small>50 Bs • Pro</small>
+                                </div>
                             </div>
                         </div>
-                        <div class="cancha-chip spawn-balloon" data-cancha="B" data-precio="45">
-                            <div class="chip-avatar">
-                                <img loading="lazy" src="img/vol/B.jpeg" alt="Cancha B" class="chip-img">
-                                <span class="badge-lvl">B</span>
-                            </div>
-                            <div class="chip-info">
-                                <strong>CANCHA B</strong>
-                                <small>45 Bs • Blindex</small>
-                            </div>
-                        </div>
-                        <div class="cancha-chip spawn-balloon" data-cancha="C" data-precio="50">
-                            <div class="chip-avatar">
-                                <img loading="lazy" src="img/vol/C.jpeg" alt="Cancha C" class="chip-img">
-                                <span class="badge-lvl">C</span>
-                            </div>
-                            <div class="chip-info">
-                                <strong>CANCHA C</strong>
-                                <small>50 Bs • Pro</small>
-                            </div>
-                        </div>
+                        <button id="btn-ver-todas-wally" class="btn-ver-todas spawn-balloon" style="display:none;">↩ TODAS</button>
                     </div>
-
-                    <button id="btn-ver-todas-wally" class="btn-ver-todas spawn-balloon" style="display:none;">↩ TODAS</button>
 
                     <div class="timer-corner-box">
                         <div id="status-cancha-wally" class="status-pill disponible">
@@ -86,7 +1266,7 @@
                     </div>
                 </div>
 
-                <!-- GRID 3 COLUMNAS -->
+                <!-- GRID RESPONSIVO -->
                 <div class="grid-layout">
                     
                     <!-- COL 1: CONFIGURACIÓN Y HORARIOS -->
@@ -99,8 +1279,8 @@
                         </div>
 
                         <div class="input-compact-grid">
-                            <div class="field-mini"><label>📅 Fecha:</label><input type="date" id="fecha-wally"></div>
-                            <div class="field-mini"><label>⏰ Hora:</label><input type="time" id="hora-wally" readonly></div>
+                            <div class="field-mini"><label for="fecha-wally">📅 Fecha:</label><input type="date" id="fecha-wally"></div>
+                            <div class="field-mini"><label for="hora-wally">⏰ Hora:</label><input type="time" id="hora-wally" readonly value="14:00"></div>
                         </div>
 
                         <div class="horarios-container">
@@ -124,8 +1304,7 @@
                         </div>
 
                         <div class="carousel" data-carousel="wally" aria-label="Galería wally">
-                            <div class="carousel-track">
-                            </div>
+                            <div class="carousel-track"></div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
                             <div class="carousel-dots"></div>
@@ -140,8 +1319,8 @@
                                 <span class="badge-count"><span id="total-jugadores-wally">0</span>/16</span>
                             </div>
                             <div class="input-group-mini">
-                                <input type="text" id="nombre-jugador-wally" placeholder="Nombre jugador..." maxlength="25">
-                                <button id="btn-anotar-wally" class="spawn-balloon">➕</button>
+                                <input type="text" id="nombre-jugador-wally" placeholder="Nombre jugador..." maxlength="25" autocomplete="off">
+                                <button id="btn-anotar-wally" class="spawn-balloon" aria-label="Añadir jugador">➕</button>
                             </div>
                             <div class="scroll-list-wrapper">
                                 <ul id="lista-jugadores-wally" class="player-list-mini"></ul>
@@ -151,7 +1330,7 @@
                         <div id="panel-conjunto-wally" class="sub-panel-hidden" style="display:none;">
                             <h4 class="col-title">👑 2. Responsable / Capitán</h4>
                             <div class="field-mini-block">
-                                <label>Nombre del Capitán / Equipo:</label>
+                                <label for="nombre-capitan-wally">Nombre del Capitán / Equipo:</label>
                                 <input type="text" id="nombre-capitan-wally" placeholder="Ej. Team Inmortals" maxlength="35">
                             </div>
                             <div class="info-card-conjunto">
@@ -173,7 +1352,7 @@
                                     <span class="hidra-name">Sin pack</span>
                                     <span class="hidra-badge">0 Bs</span>
                                 </button>
-                                <button type="button" class="btn-hidra spawn-balloon" data-sport="wally" data-precio="10" data-nombre="Pack Agua 6x">
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="wally" data-precio="10" data-nombre="Agua 6x">
                                     <span class="hidra-icon">💧</span>
                                     <span class="hidra-name">Agua 6x</span>
                                     <span class="hidra-badge">+10 Bs</span>
@@ -200,7 +1379,7 @@
                                 <div class="qr-fake-art"></div>
                                 <span>[ 📷 ESCANEAR QR ]</span>
                             </div>
-                            <p>Total a Pagar: <strong id="monto-qr-wally">0.00</strong> Bs</p>
+                            <p>Total a Pagar: <strong id="monto-qr-wally">40.00</strong> Bs</p>
                             <button class="confirm-btn-mini spawn-balloon" data-sport="wally">✔ Validar QR</button>
                         </div>
                         <div class="finalizar-container-mini">
@@ -217,7 +1396,7 @@
             <div class="dashboard-card glass-panel">
                 <div class="top-row">
                     <div class="single-cancha-header">
-                        <img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Futsal Arena" class="cancha-thumb">
+                        <img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Futsal Arena" class="cancha-thumb" onerror="this.style.display='none';">
                         <div class="single-cancha-text">
                             <strong>⚽ ARENA FUTSAL SINTÉTICA</strong>
                             <small>120 Bs/hora • Iluminación LED Pro</small>
@@ -243,8 +1422,8 @@
                             <button class="btn-modo spawn-balloon" data-sport="futsal" data-modo="conjunto">💳 Conjunto</button>
                         </div>
                         <div class="input-compact-grid">
-                            <div class="field-mini"><label>📅 Fecha:</label><input type="date" id="fecha-futsal"></div>
-                            <div class="field-mini"><label>⏰ Hora:</label><input type="time" id="hora-futsal" readonly></div>
+                            <div class="field-mini"><label for="fecha-futsal">📅 Fecha:</label><input type="date" id="fecha-futsal"></div>
+                            <div class="field-mini"><label for="hora-futsal">⏰ Hora:</label><input type="time" id="hora-futsal" readonly value="18:00"></div>
                         </div>
 
                         <div class="horarios-container">
@@ -265,8 +1444,7 @@
                         </div>
 
                         <div class="carousel" data-carousel="futsal" aria-label="Galería futsal">
-                            <div class="carousel-track">
-                            </div>
+                            <div class="carousel-track"></div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
                             <div class="carousel-dots"></div>
@@ -280,8 +1458,8 @@
                                 <span class="badge-count"><span id="total-jugadores-futsal">0</span>/16</span>
                             </div>
                             <div class="input-group-mini">
-                                <input type="text" id="nombre-jugador-futsal" placeholder="Nombre jugador..." maxlength="25">
-                                <button id="btn-anotar-futsal" class="spawn-balloon">➕</button>
+                                <input type="text" id="nombre-jugador-futsal" placeholder="Nombre jugador..." maxlength="25" autocomplete="off">
+                                <button id="btn-anotar-futsal" class="spawn-balloon" aria-label="Añadir jugador">➕</button>
                             </div>
                             <div class="scroll-list-wrapper">
                                 <ul id="lista-jugadores-futsal" class="player-list-mini"></ul>
@@ -290,7 +1468,7 @@
                         <div id="panel-conjunto-futsal" class="sub-panel-hidden" style="display:none;">
                             <h4 class="col-title">👑 2. Responsable / Capitán</h4>
                             <div class="field-mini-block">
-                                <label>Nombre del Capitán / Equipo:</label>
+                                <label for="nombre-capitan-futsal">Nombre del Capitán / Equipo:</label>
                                 <input type="text" id="nombre-capitan-futsal" placeholder="Ej. Real Futsal" maxlength="35">
                             </div>
                             <div class="info-card-conjunto">
@@ -311,7 +1489,7 @@
                                     <span class="hidra-name">Sin pack</span>
                                     <span class="hidra-badge">0 Bs</span>
                                 </button>
-                                <button type="button" class="btn-hidra spawn-balloon" data-sport="futsal" data-precio="10" data-nombre="Pack Agua 6x">
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="futsal" data-precio="10" data-nombre="Agua 6x">
                                     <span class="hidra-icon">💧</span>
                                     <span class="hidra-name">Agua 6x</span>
                                     <span class="hidra-badge">+10 Bs</span>
@@ -338,7 +1516,7 @@
                                 <div class="qr-fake-art"></div>
                                 <span>[ 📷 ESCANEAR QR ]</span>
                             </div>
-                            <p>Total a Pagar: <strong id="monto-qr-futsal">0.00</strong> Bs</p>
+                            <p>Total a Pagar: <strong id="monto-qr-futsal">120.00</strong> Bs</p>
                             <button class="confirm-btn-mini spawn-balloon" data-sport="futsal">✔ Validar QR</button>
                         </div>
                         <div class="finalizar-container-mini">
@@ -354,7 +1532,7 @@
             <div class="dashboard-card glass-panel">
                 <div class="top-row">
                     <div class="single-cancha-header">
-                        <img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Vóley Master" class="cancha-thumb">
+                        <img loading="lazy" src="img/vol/CANCHA.jpeg" alt="Vóley Master" class="cancha-thumb" onerror="this.style.display='none';">
                         <div class="single-cancha-text">
                             <strong>🏐 ARENA VÓLEY MASTER</strong>
                             <small>80 Bs/hora • Red Ajustable Oficial</small>
@@ -380,8 +1558,8 @@
                             <button class="btn-modo spawn-balloon" data-sport="voley" data-modo="conjunto">💳 Conjunto</button>
                         </div>
                         <div class="input-compact-grid">
-                            <div class="field-mini"><label>📅 Fecha:</label><input type="date" id="fecha-voley"></div>
-                            <div class="field-mini"><label>⏰ Hora:</label><input type="time" id="hora-voley" readonly></div>
+                            <div class="field-mini"><label for="fecha-voley">📅 Fecha:</label><input type="date" id="fecha-voley"></div>
+                            <div class="field-mini"><label for="hora-voley">⏰ Hora:</label><input type="time" id="hora-voley" readonly value="15:00"></div>
                         </div>
 
                         <div class="horarios-container">
@@ -402,8 +1580,7 @@
                         </div>
 
                         <div class="carousel" data-carousel="voley" aria-label="Galería voley">
-                            <div class="carousel-track">
-                            </div>
+                            <div class="carousel-track"></div>
                             <button class="carousel-btn prev" aria-label="Anterior">&#10094;</button>
                             <button class="carousel-btn next" aria-label="Siguiente">&#10095;</button>
                             <div class="carousel-dots"></div>
@@ -417,8 +1594,8 @@
                                 <span class="badge-count"><span id="total-jugadores-voley">0</span>/16</span>
                             </div>
                             <div class="input-group-mini">
-                                <input type="text" id="nombre-jugador-voley" placeholder="Nombre jugador..." maxlength="25">
-                                <button id="btn-anotar-voley" class="spawn-balloon">➕</button>
+                                <input type="text" id="nombre-jugador-voley" placeholder="Nombre jugador..." maxlength="25" autocomplete="off">
+                                <button id="btn-anotar-voley" class="spawn-balloon" aria-label="Añadir jugador">➕</button>
                             </div>
                             <div class="scroll-list-wrapper">
                                 <ul id="lista-jugadores-voley" class="player-list-mini"></ul>
@@ -427,7 +1604,7 @@
                         <div id="panel-conjunto-voley" class="sub-panel-hidden" style="display:none;">
                             <h4 class="col-title">👑 2. Responsable / Capitán</h4>
                             <div class="field-mini-block">
-                                <label>Nombre del Capitán / Equipo:</label>
+                                <label for="nombre-capitan-voley">Nombre del Capitán / Equipo:</label>
                                 <input type="text" id="nombre-capitan-voley" placeholder="Ej. Vóley Master" maxlength="35">
                             </div>
                             <div class="info-card-conjunto">
@@ -448,7 +1625,7 @@
                                     <span class="hidra-name">Sin pack</span>
                                     <span class="hidra-badge">0 Bs</span>
                                 </button>
-                                <button type="button" class="btn-hidra spawn-balloon" data-sport="voley" data-precio="10" data-nombre="Pack Agua 6x">
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="voley" data-precio="10" data-nombre="Agua 6x">
                                     <span class="hidra-icon">💧</span>
                                     <span class="hidra-name">Agua 6x</span>
                                     <span class="hidra-badge">+10 Bs</span>
@@ -475,7 +1652,7 @@
                                 <div class="qr-fake-art"></div>
                                 <span>[ 📷 ESCANEAR QR ]</span>
                             </div>
-                            <p>Total a Pagar: <strong id="monto-qr-voley">0.00</strong> Bs</p>
+                            <p>Total a Pagar: <strong id="monto-qr-voley">80.00</strong> Bs</p>
                             <button class="confirm-btn-mini spawn-balloon" data-sport="voley">✔ Validar QR</button>
                         </div>
                         <div class="finalizar-container-mini">
@@ -485,7 +1662,6 @@
                 </div>
             </div>
         </section>
-
 
         <!-- ================= SECCIÓN BUSCADOR (estilo Google Imágenes) ================= -->
         <section id="buscador" class="content-section" style="display: none;">
@@ -515,17 +1691,1112 @@
 
     </main>
 
-    <script src="carousel-data.js"></script>
-    <script src="script.js"></script>
-    <script src="buscador.js"></script>
     <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function () {
-                navigator.serviceWorker.register('sw.js').catch(function (err) {
-                    console.error('Fallo al registrar el Service Worker:', err);
+/* ============================================================
+   GALERÍA DEL CARRUSEL — 10 imágenes por deporte
+   Para usar un link de Google (o cualquier web), pega la URL
+   directa de la imagen en el campo "url" (clic derecho sobre la
+   imagen > "Copiar dirección de la imagen"). Si "url" está vacío
+   o el link falla, se muestra la imagen local de respaldo.
+   ============================================================ */
+window.CAROUSEL_IMAGES = {
+  "wally": [
+    {
+      "local": "img/galeria/wally-01.svg",
+      "alt": "Balón de wally",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-02.svg",
+      "alt": "Rebote en la pared",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-03.svg",
+      "alt": "Torneo de wally",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-04.svg",
+      "alt": "Campeones",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-05.svg",
+      "alt": "Marcador y tiempo",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-06.svg",
+      "alt": "Zapatillas de juego",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-07.svg",
+      "alt": "Defensa y rescate",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-08.svg",
+      "alt": "Hinchada",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-09.svg",
+      "alt": "Remate potente",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/wally-10.svg",
+      "alt": "Juego en equipo",
+      "url": ""
+    }
+  ],
+  "futsal": [
+    {
+      "local": "img/galeria/futsal-01.svg",
+      "alt": "Balón de futsal",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-02.svg",
+      "alt": "Gol",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-03.svg",
+      "alt": "Chimpunes",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-04.svg",
+      "alt": "Arquero",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-05.svg",
+      "alt": "Copa de campeón",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-06.svg",
+      "alt": "Camiseta del equipo",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-07.svg",
+      "alt": "Silbato y árbitro",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-08.svg",
+      "alt": "Medalla de oro",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-09.svg",
+      "alt": "Disparo a puerta",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/futsal-10.svg",
+      "alt": "Fair play",
+      "url": ""
+    }
+  ],
+  "voley": [
+    {
+      "local": "img/galeria/voley-01.svg",
+      "alt": "Balón de vóley",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-02.svg",
+      "alt": "Copa de vóley",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-03.svg",
+      "alt": "Medalla de oro",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-04.svg",
+      "alt": "Remate",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-05.svg",
+      "alt": "Bloqueo",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-06.svg",
+      "alt": "Calzado deportivo",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-07.svg",
+      "alt": "Uniforme del equipo",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-08.svg",
+      "alt": "Aficionados",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-09.svg",
+      "alt": "Tiempo de partido",
+      "url": ""
+    },
+    {
+      "local": "img/galeria/voley-10.svg",
+      "alt": "Saludo final",
+      "url": ""
+    }
+  ]
+};
+
+/* ============================================================
+   BUSCADOR — fuente de fotos reales
+   Por defecto las fotos se buscan en vivo en Wikimedia Commons
+   (gratis, sin clave). Si quieres que vengan de Google Imágenes:
+   1) crea un buscador en https://programmablesearchengine.google.com
+      (activa "Búsqueda de imágenes") y copia su ID  -> googleCx
+   2) crea una clave de API de "Custom Search JSON API" -> googleKey
+   (Google da ~100 búsquedas gratis por día.)
+   ============================================================ */
+window.BUSCADOR_CONFIG = {
+  googleKey: "",
+  googleCx: "",
+  porDeporte: 20
+};
+
+</script>
+<script>
+$(document).ready(function() {
+    // ==========================================
+    // 0. REGISTRO DE SERVICE WORKER (PWA)
+    // ==========================================
+    if ('serviceWorker' in navigator) {
+        window.addEventListener('load', function() {
+            navigator.serviceWorker.register('./sw.js')
+                .then(function(reg) {
+                    console.log('✅ DeporZone Service Worker activo:', reg.scope);
+                })
+                .catch(function(err) {
+                    console.warn('⚠️ Fallo de Service Worker:', err);
+                });
+        });
+    }
+
+    // ==========================================
+    // 0.1 CONTROL DE INSTALACIÓN PWA (MÓVILES Y DESKTOP)
+    // ==========================================
+    let deferredInstallPrompt = null;
+    const $installBtn = $('#pwa-install-btn');
+
+    window.addEventListener('beforeinstallprompt', function(e) {
+        e.preventDefault();
+        deferredInstallPrompt = e;
+        $installBtn.css('display', 'inline-flex').fadeIn(250);
+    });
+
+    $installBtn.click(async function() {
+        if (deferredInstallPrompt) {
+            deferredInstallPrompt.prompt();
+            const choice = await deferredInstallPrompt.userChoice;
+            if (choice.outcome === 'accepted') {
+                $installBtn.hide();
+            }
+            deferredInstallPrompt = null;
+        } else {
+            alert("📲 Para instalar DeporZone en tu celular:\n\n• En Android (Chrome): Toca el menú (⋮) arriba a la derecha y selecciona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n• En iPhone (Safari): Toca el botón Compartir (⎋) abajo y selecciona 'Agregar a pantalla de inicio' (➕).");
+        }
+    });
+
+    window.addEventListener('appinstalled', function() {
+        $installBtn.hide();
+        deferredInstallPrompt = null;
+    });
+
+    // Detectar iOS Safari para mostrar banner de instalación
+    const isIosDevice = () => {
+        const ua = window.navigator.userAgent.toLowerCase();
+        return /iphone|ipad|ipod/.test(ua);
+    };
+    const isStandalone = () => ('standalone' in window.navigator && window.navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches;
+
+    if (isIosDevice() && !isStandalone() && !sessionStorage.getItem('deporzone_ios_banner_closed')) {
+        $('#ios-pwa-banner').slideDown(250);
+    }
+
+    $('#btn-close-ios-banner').click(function() {
+        $('#ios-pwa-banner').slideUp(200);
+        sessionStorage.setItem('deporzone_ios_banner_closed', 'true');
+    });
+
+    // ==========================================
+    // 1. ESTADO DEL SISTEMA
+    // ==========================================
+    let estadoSistema = {
+        wally: {
+            subCanchas: {
+                'A': { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0 },
+                'B': { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0 },
+                'C': { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0 }
+            },
+            canchaSeleccionada: 'A',
+            precioBase: 40,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
+            modo: 'individual',
+            max: 16
+        },
+        futsal: { 
+            jugadores: [], 
+            timerConfirm: null, 
+            timerOcupado: null, 
+            ocupada: false, 
+            segundosRestantes: 0, 
+            precioBase: 120,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
+            modo: 'individual', 
+            max: 16 
+        },
+        voley: { 
+            jugadores: [], 
+            timerConfirm: null, 
+            timerOcupado: null, 
+            ocupada: false, 
+            segundosRestantes: 0, 
+            precioBase: 80,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
+            modo: 'individual', 
+            max: 16 
+        }
+    };
+
+    // Pre-llenar fecha con hoy en formato YYYY-MM-DD
+    const hoyStr = new Date().toISOString().split('T')[0];
+    $('#fecha-wally, #fecha-futsal, #fecha-voley').val(hoyStr);
+
+    // ==========================================
+    // 2. EFECTO DE GLOBOS TÁCTIL Y CLIC
+    // ==========================================
+    const emojilist = ['🎈', '🎉', '⚡', '🏐', '⚽', '🏆', '⭐'];
+
+    $(document).on('click', '.spawn-balloon, .cancha-chip, .btn-modo, .slot-btn, .nav-link', function(e) {
+        let posX = e.clientX;
+        let posY = e.clientY;
+
+        // Fallback táctil o si se dispara por teclado/accesibilidad
+        if (!posX || !posY) {
+            let rect = this.getBoundingClientRect();
+            posX = rect.left + rect.width / 2;
+            posY = rect.top + rect.height / 2;
+        }
+
+        const isMobileScreen = window.innerWidth <= 768;
+        const count = isMobileScreen ? 2 : 3;
+
+        for (let i = 0; i < count; i++) {
+            let randomEmoji = emojilist[Math.floor(Math.random() * emojilist.length)];
+            let $balloon = $('<div class="floating-balloon"></div>').text(randomEmoji);
+
+            let offsetX = (Math.random() - 0.5) * 35;
+            let offsetY = (Math.random() - 0.5) * 15;
+
+            $balloon.css({
+                left: (posX + offsetX) + 'px',
+                top: (posY + offsetY) + 'px'
+            });
+
+            $('body').append($balloon);
+
+            setTimeout(function() {
+                $balloon.remove();
+            }, 1200);
+        }
+    });
+
+    // ==========================================
+    // 3. TEMA OSCURO / CLARO CON PERSISTENCIA
+    // ==========================================
+    const savedTheme = localStorage.getItem('deporzone_theme');
+    if (savedTheme === 'light') {
+        $('body').addClass('light-theme');
+        $('#theme-toggle').html('☀️ <span class="theme-text">Modo Claro</span>');
+        $('#meta-theme-color').attr('content', '#f1f5f9');
+    }
+
+    $('#theme-toggle').click(function() {
+        $('body').toggleClass('light-theme');
+        const isLight = $('body').hasClass('light-theme');
+        if (isLight) {
+            $(this).html('☀️ <span class="theme-text">Modo Claro</span>');
+            localStorage.setItem('deporzone_theme', 'light');
+            $('#meta-theme-color').attr('content', '#f1f5f9');
+        } else {
+            $(this).html('🌙 <span class="theme-text">Modo Oscuro</span>');
+            localStorage.setItem('deporzone_theme', 'dark');
+            $('#meta-theme-color').attr('content', '#030712');
+        }
+    });
+
+    // ==========================================
+    // 4. NAVEGACIÓN ENTRE SECCIONES / DEPORTES
+    // ==========================================
+    $('.nav-link').click(function(e) {
+        e.preventDefault();
+        $('.nav-link').removeClass('active');
+        $(this).addClass('active');
+
+        let sport = $(this).data('sport');
+        $('body').removeClass('theme-wally theme-futsal theme-voley theme-buscador').addClass('theme-' + sport);
+
+        $('.content-section').hide();
+        $('#' + sport).fadeIn(200);
+
+        if (sport !== 'buscador') {
+            actualizarCalculos(sport);
+        }
+    });
+
+    // ==========================================
+    // 5. SLOTS DE HORARIO
+    // ==========================================
+    $('.slot-btn').click(function() {
+        if ($(this).hasClass('ocupado')) return;
+
+        let sport = $(this).closest('.slots-grid').data('sport');
+        $(`.slots-grid[data-sport="${sport}"] .slot-btn`).removeClass('active');
+        $(this).addClass('active');
+
+        let horaSeleccionada = $(this).data('time');
+        $('#hora-' + sport).val(horaSeleccionada);
+    });
+
+    // ==========================================
+    // 6. SELECCIÓN DE CANCHAS (WALLY)
+    // ==========================================
+    $('.cancha-chip').click(function() {
+        let letraCancha = $(this).data('cancha');
+        let precioCancha = parseFloat($(this).data('precio')) || 40;
+
+        estadoSistema.wally.canchaSeleccionada = letraCancha;
+        estadoSistema.wally.precioBase = precioCancha;
+        $('#lbl-cancha-wally').text(letraCancha);
+        $('#input-precio-wally').val(precioCancha);
+
+        $('.cancha-chip').removeClass('selected');
+        $(this).addClass('selected');
+
+        if (window.innerWidth > 768) {
+            $('.cancha-chip').not(this).addClass('hidden');
+            $('#btn-ver-todas-wally').fadeIn(150);
+        }
+
+        sincronizarVistaWally();
+    });
+
+    $('#btn-ver-todas-wally').click(function() {
+        $('.cancha-chip').removeClass('hidden');
+        $(this).fadeOut(150);
+    });
+
+    // ==========================================
+    // 7. SELECTOR MODO INDIVIDUAL VS CONJUNTO
+    // ==========================================
+    $('.btn-modo').click(function() {
+        let sport = $(this).data('sport');
+        let modo = $(this).data('modo');
+
+        $(`.btn-modo[data-sport="${sport}"]`).removeClass('active');
+        $(this).addClass('active');
+
+        estadoSistema[sport].modo = modo;
+
+        if (modo === 'individual') {
+            $(`#row-cuota-${sport}`).show();
+            $(`#row-total-${sport}`).hide();
+            $(`#panel-individual-${sport}`).fadeIn(150);
+            $(`#panel-conjunto-${sport}`).hide();
+        } else {
+            $(`#row-cuota-${sport}`).hide();
+            $(`#row-total-${sport}`).show();
+            $(`#panel-individual-${sport}`).hide();
+            $(`#panel-conjunto-${sport}`).fadeIn(150);
+        }
+        actualizarCalculos(sport);
+    });
+
+    // ==========================================
+    // 8. SELECTOR DE PACK DE HIDRATACIÓN
+    // ==========================================
+    $('.btn-hidra').click(function() {
+        let sport = $(this).data('sport');
+        let precio = parseFloat($(this).data('precio')) || 0;
+        let nombre = $(this).data('nombre');
+
+        $(`.btn-hidra[data-sport="${sport}"]`).removeClass('active');
+        $(this).addClass('active');
+
+        estadoSistema[sport].hidratacion = {
+            nombre: nombre,
+            precio: precio
+        };
+
+        let hidraTexto = precio > 0 ? `${nombre} (+${precio.toFixed(2)} Bs)` : 'Sin pack (0 Bs)';
+        $(`#lbl-hidra-${sport}`).text(hidraTexto);
+
+        actualizarCalculos(sport);
+    });
+
+    $('#input-precio-wally, #input-precio-futsal, #input-precio-voley').on('input change', function() {
+        let sport = $(this).attr('id').replace('input-precio-', '');
+        actualizarCalculos(sport);
+    });
+
+    function sincronizarVistaWally() {
+        let canchaKey = estadoSistema.wally.canchaSeleccionada;
+        let subData = estadoSistema.wally.subCanchas[canchaKey];
+
+        renderizarLista('wally');
+        actualizarCalculos('wally');
+
+        let $pill = $('#status-cancha-wally');
+        if (subData.ocupada) {
+            $pill.removeClass('disponible').addClass('ocupado');
+            $pill.find('#lbl-status-wally').html(`🔴 Ocupada`);
+            $('#timer-ocupado-wally').show();
+        } else {
+            $pill.removeClass('ocupado').addClass('disponible');
+            $pill.find('#lbl-status-wally').html(`🟢 Libre`);
+            $('#timer-ocupado-wally').hide();
+        }
+
+        if (subData.timerConfirm) {
+            $('#btn-iniciar-timer-wally').hide();
+            $('#display-timer-confirm-wally').show();
+        } else {
+            $('#display-timer-confirm-wally').hide();
+            $('#btn-iniciar-timer-wally').show();
+        }
+    }
+
+    // ==========================================
+    // 9. CÁLCULOS DINÁMICOS
+    // ==========================================
+    function actualizarCalculos(sport) {
+        let jugadores = sport === 'wally' 
+            ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada].jugadores 
+            : estadoSistema[sport].jugadores;
+
+        let inputVal = parseFloat($('#input-precio-' + sport).val());
+        let precioCancha = !isNaN(inputVal) && inputVal > 0 ? inputVal : (estadoSistema[sport].precioBase || 0);
+        let precioHidra = (estadoSistema[sport].hidratacion && estadoSistema[sport].hidratacion.precio) || 0;
+        let precioTotal = precioCancha + precioHidra;
+
+        let totalJugadores = jugadores.length;
+        let montoTotal = precioTotal.toFixed(2);
+
+        $('#monto-total-conjunto-' + sport).text(montoTotal);
+        $('#total-jugadores-' + sport).text(totalJugadores);
+
+        if (totalJugadores > 0 && precioTotal > 0) {
+            let cuota = (precioTotal / totalJugadores).toFixed(2);
+            $('#cuota-persona-' + sport).text(cuota);
+        } else {
+            $('#cuota-persona-' + sport).text('0.00');
+        }
+
+        if (estadoSistema[sport].modo === 'individual') {
+            let cuotaActual = (totalJugadores > 0 && precioTotal > 0) ? (precioTotal / totalJugadores).toFixed(2) : montoTotal;
+            $('#monto-qr-' + sport).text(cuotaActual);
+        } else {
+            $('#monto-qr-' + sport).text(montoTotal);
+        }
+    }
+
+    // ==========================================
+    // 10. GESTIÓN DE JUGADORES
+    // ==========================================
+    function agregarJugador(sport) {
+        let subData = sport === 'wally' 
+            ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] 
+            : estadoSistema[sport];
+
+        if (subData.ocupada) { 
+            alert("❌ Cancha ocupada actualmente."); 
+            return; 
+        }
+
+        let $input = $('#nombre-jugador-' + sport);
+        let nombre = $input.val().trim();
+        if (!nombre) {
+            $input.focus();
+            return;
+        }
+
+        if (subData.jugadores.length >= 16) { 
+            alert("⚠️ Máximo 16 integrantes permitidos."); 
+            return; 
+        }
+
+        subData.jugadores.push({ nombre: nombre, confirmado: false, pagado: false });
+        renderizarLista(sport);
+        $input.val('').focus();
+        actualizarCalculos(sport);
+    }
+
+    function renderizarLista(sport) {
+        let jugadores = sport === 'wally' 
+            ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada].jugadores 
+            : estadoSistema[sport].jugadores;
+
+        let $lista = $('#lista-jugadores-' + sport).empty();
+
+        if (jugadores.length === 0) {
+            $lista.append('<li style="color:var(--text-muted); font-size:11px; justify-content:center;">Sin jugadores anotados</li>');
+            return;
+        }
+
+        jugadores.forEach((j, i) => {
+            $lista.append(`
+                <li>
+                    <span>${i + 1}. ${escapeHtml(j.nombre)}</span>
+                    <div class="player-action-btns">
+                        <button class="btn-check-asistencia spawn-balloon ${j.confirmado ? 'confirmado' : ''}" 
+                                data-sport="${sport}" data-index="${i}" 
+                                title="${j.confirmado ? 'Asistencia confirmada' : 'Pendiente asistencia'}"
+                                aria-label="Confirmar asistencia">
+                            ${j.confirmado ? '✔' : '⏳'}
+                        </button>
+                        <button class="btn-check-pago spawn-balloon ${j.pagado ? 'pagado' : ''}" 
+                                data-sport="${sport}" data-index="${i}" 
+                                title="${j.pagado ? 'Cuota pagada' : 'Pendiente de pago'}"
+                                aria-label="Confirmar pago">
+                            ${j.pagado ? '🟢' : '🔴'}
+                        </button>
+                        <button class="btn-check-asistencia btn-eliminar-jugador" 
+                                data-sport="${sport}" data-index="${i}" 
+                                title="Eliminar jugador"
+                                style="background:rgba(239, 68, 68, 0.2); color:#ef4444;"
+                                aria-label="Eliminar">
+                            ✕
+                        </button>
+                    </div>
+                </li>
+            `);
+        });
+    }
+
+    function escapeHtml(str) {
+        return $('<div>').text(str).html();
+    }
+
+    $('#btn-anotar-wally').click(function() { agregarJugador('wally'); });
+    $('#btn-anotar-futsal').click(function() { agregarJugador('futsal'); });
+    $('#btn-anotar-voley').click(function() { agregarJugador('voley'); });
+
+    // Enter en input para agregar directo
+    $('#nombre-jugador-wally, #nombre-jugador-futsal, #nombre-jugador-voley').keypress(function(e) {
+        if (e.which === 13) {
+            let sport = $(this).attr('id').replace('nombre-jugador-', '');
+            agregarJugador(sport);
+        }
+    });
+
+    $(document).on('click', '.btn-check-asistencia:not(.btn-eliminar-jugador)', function() {
+        let sport = $(this).data('sport');
+        let i = $(this).data('index');
+        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
+        if (subData.jugadores[i]) {
+            subData.jugadores[i].confirmado = !subData.jugadores[i].confirmado;
+            renderizarLista(sport);
+        }
+    });
+
+    $(document).on('click', '.btn-check-pago', function() {
+        let sport = $(this).data('sport');
+        let i = $(this).data('index');
+        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
+        if (subData.jugadores[i]) {
+            subData.jugadores[i].pagado = !subData.jugadores[i].pagado;
+            renderizarLista(sport);
+        }
+    });
+
+    $(document).on('click', '.btn-eliminar-jugador', function() {
+        let sport = $(this).data('sport');
+        let i = $(this).data('index');
+        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
+        if (subData.jugadores[i]) {
+            subData.jugadores.splice(i, 1);
+            renderizarLista(sport);
+            actualizarCalculos(sport);
+        }
+    });
+
+    // ==========================================
+    // 11. TIMER DE CONFIRMACIÓN (10 MIN)
+    // ==========================================
+    $('.btn-timer-mini').click(function() {
+        let sport = $(this).attr('id').replace('btn-iniciar-timer-', '');
+        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
+        let tiempo = 10 * 60;
+
+        $('#btn-iniciar-timer-' + sport).hide();
+        $('#display-timer-confirm-' + sport).show();
+
+        if (subData.timerConfirm) clearInterval(subData.timerConfirm);
+
+        subData.timerConfirm = setInterval(() => {
+            let m = Math.floor(tiempo / 60);
+            let s = tiempo % 60;
+            $('#time-left-' + sport).text(`${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`);
+            if (tiempo-- <= 0) {
+                clearInterval(subData.timerConfirm);
+                subData.timerConfirm = null;
+                subData.jugadores = [];
+                if (sport === 'wally') sincronizarVistaWally(); else renderizarLista(sport);
+                actualizarCalculos(sport);
+                alert("⏱️ El tiempo de confirmación de 10 minutos ha expirado.");
+            }
+        }, 1000);
+    });
+
+    // ==========================================
+    // 12. FINALIZAR RESERVA
+    // ==========================================
+    $('.btn-finalizar-reserva-mini').click(function() {
+        let sport = $(this).attr('id').replace('btn-finalizar-', '');
+        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
+        let fecha = $('#fecha-' + sport).val();
+        let hora = $('#hora-' + sport).val();
+
+        if (!fecha || !hora) { alert("❌ Selecciona Fecha y Slot de Hora."); return; }
+
+        let modo = estadoSistema[sport].modo;
+
+        if (modo === 'individual') {
+            if (subData.jugadores.length === 0 || !subData.jugadores.every(j => j.confirmado && j.pagado)) {
+                alert("⚠️ Todos los jugadores deben estar CONFIRMADOS y PAGADOS.");
+                return;
+            }
+        } else {
+            let capitan = $(`#nombre-capitan-${sport}`).val().trim();
+            if (!capitan) { 
+                alert("⚠️ Ingresa el nombre del Capitán / Responsable."); 
+                $(`#nombre-capitan-${sport}`).focus();
+                return; 
+            }
+        }
+
+        if (subData.timerConfirm) {
+            clearInterval(subData.timerConfirm);
+            subData.timerConfirm = null;
+        }
+
+        subData.segundosRestantes = 3600;
+        subData.ocupada = true;
+
+        let $pill = $('#status-cancha-' + sport);
+        $pill.removeClass('disponible').addClass('ocupado');
+        $pill.find('span:first').html(`🔴 Ocupada`);
+        $('#timer-ocupado-' + sport).show();
+
+        if (subData.timerOcupado) clearInterval(subData.timerOcupado);
+
+        subData.timerOcupado = setInterval(() => {
+            let h = Math.floor(subData.segundosRestantes / 3600);
+            let m = Math.floor((subData.segundosRestantes % 3600) / 60);
+            let s = subData.segundosRestantes % 60;
+
+            $('#timer-ocupado-' + sport).text(` | ⏳ ${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`);
+
+            if (subData.segundosRestantes-- <= 0) {
+                clearInterval(subData.timerOcupado);
+                subData.ocupada = false;
+                subData.jugadores = [];
+                $pill.removeClass('ocupado').addClass('disponible');
+                $pill.find('span:first').html(`🟢 Libre`);
+                $('#timer-ocupado-' + sport).hide();
+            }
+        }, 1000);
+
+        let detalle = modo === 'conjunto' ? `\nResponsable: ${$(`#nombre-capitan-${sport}`).val()}` : '';
+        let hidra = estadoSistema[sport].hidratacion;
+        let detalleHidra = hidra && hidra.precio > 0 
+            ? `\n🥤 Pack Hidratación: ${hidra.nombre} (+${hidra.precio.toFixed(2)} Bs)` 
+            : '\n🥤 Pack Hidratación: Sin pack';
+        let totalReserva = modo === 'conjunto' 
+            ? `${$(`#monto-total-conjunto-${sport}`).text()} Bs` 
+            : `${$(`#cuota-persona-${sport}`).text()} Bs / persona (${subData.jugadores.length} jugadores)`;
+
+        let nombreCancha = sport === 'wally' ? `Wally Cancha ${estadoSistema.wally.canchaSeleccionada}` : sport.toUpperCase();
+        alert(`🏆 ¡RESERVA EXITOSA! (${nombreCancha})${detalle}${detalleHidra}\nTotal: ${totalReserva}\nFecha: ${fecha} - Hora: ${hora}`);
+    });
+
+    // ==========================================
+    // 13. PASARELA DE PAGO Y QR
+    // ==========================================
+    $('.pay-btn-mini').click(function() {
+        let sport = $(this).data('sport');
+        let metodo = $(this).data('method');
+        $(`.pay-btn-mini[data-sport="${sport}"]`).removeClass('active-pay');
+        $(this).addClass('active-pay');
+        if (metodo === 'qr') $(`#qr-container-${sport}`).slideDown(150);
+        else $(`#qr-container-${sport}`).slideUp(150);
+    });
+
+    $('.confirm-btn-mini').click(function() {
+        let sport = $(this).data('sport');
+        alert("✔ Pago con QR verificado correctamente.");
+        $(`#qr-container-${sport}`).slideUp(150);
+    });
+
+    // Inicializar cálculos de partida
+    actualizarCalculos('wally');
+    actualizarCalculos('futsal');
+    actualizarCalculos('voley');
+});
+
+// ==========================================
+// 14. CARRUSEL
+// ==========================================
+(function () {
+    document.querySelectorAll('.carousel').forEach(function (car) {
+        var track = car.querySelector('.carousel-track');
+        if (!track) return;
+        var imgs = (window.CAROUSEL_IMAGES || {})[car.dataset.carousel] || [];
+        imgs.forEach(function (it) {
+            var fig = document.createElement('figure');
+            fig.className = 'carousel-slide';
+            var im = document.createElement('img');
+            im.loading = 'lazy'; im.width = 800; im.height = 440; im.alt = it.alt;
+            im.referrerPolicy = 'no-referrer';
+            im.onerror = function () { im.onerror = null; im.src = it.local; };
+            im.src = it.url || it.local;
+            var cap = document.createElement('figcaption');
+            cap.textContent = it.alt;
+            fig.appendChild(im); fig.appendChild(cap);
+            track.appendChild(fig);
+        });
+        var total = imgs.length;
+        var dots = car.querySelector('.carousel-dots');
+        var i = 0, timer = null, startX = null;
+
+        if (dots) {
+            for (var d = 0; d < total; d++) {
+                dots.insertAdjacentHTML('beforeend', '<button data-i="' + d + '" aria-label="Imagen ' + (d + 1) + '"></button>');
+            }
+        }
+
+        function go(n) {
+            if (total === 0) return;
+            i = (n + total) % total;
+            track.style.transform = 'translateX(-' + (i * 100) + '%)';
+            if (dots) {
+                dots.querySelectorAll('button').forEach(function (b, k) { b.classList.toggle('active', k === i); });
+            }
+        }
+        function play() { stop(); timer = setInterval(function () { go(i + 1); }, 4000); }
+        function stop() { if (timer) { clearInterval(timer); timer = null; } }
+
+        car.addEventListener('click', function (e) {
+            var b = e.target.closest('button');
+            if (!b) return;
+            if (b.classList.contains('prev')) go(i - 1);
+            else if (b.classList.contains('next')) go(i + 1);
+            else if (b.dataset.i !== undefined) go(+b.dataset.i);
+            play();
+        });
+        car.addEventListener('mouseenter', stop);
+        car.addEventListener('mouseleave', play);
+        car.addEventListener('touchstart', function (e) { startX = e.touches[0].clientX; stop(); }, { passive: true });
+        car.addEventListener('touchend', function (e) {
+            if (startX === null) return;
+            var dx = e.changedTouches[0].clientX - startX;
+            if (Math.abs(dx) > 40) go(dx < 0 ? i + 1 : i - 1);
+            startX = null; play();
+        });
+
+        go(0);
+        play();
+    });
+})();
+
+</script>
+<script>
+/* ===== BUSCADOR DE IMÁGENES REALES (estilo Google Imágenes) =====
+   - Fotos buscadas en vivo: Google (si hay clave en BUSCADOR_CONFIG) o Wikimedia Commons.
+   - Miniaturas con lazy loading nativo (loading="lazy").
+   - 1er clic: se agranda en un panel bajo su fila. 2º clic en la foto grande: abre Google Imágenes.
+   - Enter con texto en la barra: búsqueda en vivo de ese texto. */
+(function () {
+    var CFG = window.BUSCADOR_CONFIG || {};
+    var DATA = window.CAROUSEL_IMAGES || {};
+    var CATS = {
+        wally:  { label: 'Wally',    term: 'wallyball', q: 'wallyball',        google: 'wallyball' },
+        voley:  { label: 'Voleibol', term: 'voleibol',  q: 'volleyball match', google: 'voleibol' },
+        futsal: { label: 'Fútbol',   term: 'fútbol',    q: 'futsal match',     google: 'fútbol' }
+    };
+    var INFO = {
+        wally: { title: '¿Qué es el wally?', text: 'El wally (wallyball) es una variante del voleibol que se juega en una cancha cerrada por paredes, como las de racquetball. La pelota puede rebotar en las paredes y seguir en juego, lo que hace los intercambios más largos y dinámicos. Se juega con red y por equipos, normalmente de 4 a 6 personas.' },
+        voley: { title: '¿Qué es el voleibol?', text: 'El voleibol es un deporte de equipo donde dos conjuntos se enfrentan separados por una red e intentan hacer caer el balón en el campo contrario sin que toque el suelo en el propio. Fue creado en 1895 por William G. Morgan en Estados Unidos y hoy es deporte olímpico.' },
+        futsal: { title: '¿Qué es el fútbol?', text: 'El fútbol es un deporte de equipo en el que dos conjuntos buscan meter el balón en la portería rival, principalmente con los pies. Sus reglas modernas se fijaron en Inglaterra en 1863. El futsal (fútbol sala) es su versión en cancha pequeña y cerrada, con equipos de 5 jugadores.' }
+    };
+    var SIZES = [{ v: '', t: 'Cualquier tamaño' }, { v: 'l', t: 'Grande' }, { v: 'm', t: 'Mediano' }, { v: 'i', t: 'Ícono' }];
+    var N = CFG.porDeporte || 20;
+    var USE_GOOGLE = !!(CFG.googleKey && CFG.googleCx);
+
+    var $ = function (id) { return document.getElementById(id); };
+    var grid = $('gs-grid'), input = $('gs-input'), form = $('gs-form'), tabs = $('gs-tabs');
+    var know = $('gs-knowledge'), count = $('gs-count'), empty = $('gs-empty'), credit = $('gs-credit');
+    if (!grid) return;
+
+    var STORE = { wally: [], voley: [], futsal: [] };
+    var LIVE = null;               // resultados de una búsqueda escrita
+    var pending = 0, offline = false;
+    var cat = 'all', open = null, panel = null, started = false;
+
+    function norm(t) { return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, ''); }
+    function googleUrl(q, size) {
+        var u = 'https://www.google.com/search?tbm=isch&q=' + encodeURIComponent(q);
+        return size ? u + '&tbs=isz:' + size : u;
+    }
+
+    /* ---------- Proveedores de fotos ---------- */
+    function fromGoogle(q) {
+        function page(start) {
+            var u = 'https://www.googleapis.com/customsearch/v1?searchType=image&num=10&start=' + start +
+                '&key=' + encodeURIComponent(CFG.googleKey) + '&cx=' + encodeURIComponent(CFG.googleCx) +
+                '&q=' + encodeURIComponent(q);
+            return fetch(u).then(function (r) { if (!r.ok) throw new Error('google ' + r.status); return r.json(); });
+        }
+        return Promise.all([page(1), page(11).catch(function () { return { items: [] }; })]).then(function (rs) {
+            var out = [];
+            rs.forEach(function (j) {
+                (j.items || []).forEach(function (it) {
+                    out.push({
+                        alt: it.title || q, src: (it.image && it.image.thumbnailLink) || it.link,
+                        full: it.link, page: it.image && it.image.contextLink, source: 'Google Imágenes'
+                    });
                 });
             });
+            return out;
+        });
+    }
+
+    function fromCommons(q) {
+        var u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*' +
+            '&generator=search&gsrnamespace=6&gsrlimit=40' +
+            '&gsrsearch=' + encodeURIComponent(q + ' filetype:bitmap') +
+            '&prop=imageinfo&iiprop=url|size|mime&iiurlwidth=480';
+        return fetch(u).then(function (r) { if (!r.ok) throw new Error('commons ' + r.status); return r.json(); })
+            .then(function (j) {
+                var pages = Object.keys((j.query && j.query.pages) || {}).map(function (k) { return j.query.pages[k]; });
+                pages.sort(function (a, b) { return (a.index || 0) - (b.index || 0); });
+                var out = [];
+                pages.forEach(function (p) {
+                    var info = p.imageinfo && p.imageinfo[0];
+                    if (!info || info.mime !== 'image/jpeg' || info.width < 800 || !info.thumburl) return;
+                    var title = p.title.replace(/^File:/, '').replace(/\.[^.]+$/, '').replace(/_/g, ' ');
+                    if (/logo|map|flag|diagram|poster|stamp|coin|screenshot/i.test(title)) return;
+                    var full = info.width >= 1280 ? info.thumburl.replace(/\/\d+px-/, '/1280px-') : info.thumburl;
+                    out.push({ alt: title, src: info.thumburl, full: full, page: info.descriptionurl, source: 'Wikimedia Commons' });
+                });
+                return out;
+            });
+    }
+    function fetchPhotos(q) { return (USE_GOOGLE ? fromGoogle(q) : fromCommons(q)).then(function (a) { return a.slice(0, N); }); }
+
+    function localFallback(c) {
+        return (DATA[c === 'futsal' ? 'futsal' : c] || []).map(function (it) {
+            return { alt: it.alt, src: it.local, full: it.local, local: true };
+        });
+    }
+
+    function loadCat(c) {
+        pending++;
+        fetchPhotos(CATS[c].q).then(function (list) {
+            STORE[c] = list.length ? list : localFallback(c);
+            if (!list.length) offline = true;
+        }).catch(function () {
+            STORE[c] = localFallback(c); offline = true;
+        }).then(function () { pending--; render(); });
+    }
+
+    /* ---------- Vista ---------- */
+    function visibleItems() {
+        var base = [];
+        if (LIVE) {
+            base = LIVE.map(function (it) { it.cat = it.cat || 'live'; return it; });
+        } else if (cat !== 'all') {
+            base = STORE[cat].map(function (it) { it.cat = cat; return it; });
+        } else {
+            var keys = Object.keys(CATS), i = 0, more = true;
+            while (more) {                                     // intercala los 3 deportes
+                more = false;
+                keys.forEach(function (k) {
+                    if (STORE[k][i]) { STORE[k][i].cat = k; base.push(STORE[k][i]); more = true; }
+                });
+                i++;
+            }
         }
-    </script>
+        var q = norm(input.value.trim());
+        if (q && !LIVE) {
+            base = base.filter(function (it) {
+                var hay = norm(it.alt + ' ' + CATS[it.cat].label + ' ' + CATS[it.cat].term + (it.cat === 'futsal' ? ' futbol futsal' : ''));
+                return q.split(/\s+/).every(function (w) { return hay.indexOf(w) !== -1; });
+            });
+        }
+        return base;
+    }
+
+    function queryFor(it) {
+        var typed = input.value.trim();
+        if (LIVE && typed) return typed;
+        return CATS[it.cat] ? CATS[it.cat].google : (typed || it.alt);
+    }
+
+    function closePanel() {
+        if (panel) { panel.remove(); panel = null; }
+        if (open) { open.classList.remove('is-open'); open = null; }
+    }
+
+    function render() {
+        closePanel();
+        var list = visibleItems();
+        grid.textContent = '';
+        list.forEach(function (it) {
+            var b = document.createElement('button');
+            b.type = 'button'; b.className = 'gs-thumb';
+            b.setAttribute('aria-label', 'Ampliar: ' + it.alt);
+            var im = document.createElement('img');
+            im.loading = 'lazy'; im.decoding = 'async';
+            im.width = 480; im.height = 480; im.alt = it.alt;
+            im.referrerPolicy = 'no-referrer';
+            im.onload = function () { b.classList.add('loaded'); };
+            im.onerror = function () { b.remove(); };        // foto rota: se quita
+            im.src = it.src;
+            var cap = document.createElement('span');
+            cap.className = 'gs-cap'; cap.textContent = it.alt;
+            b.appendChild(im); b.appendChild(cap);
+            b._item = it;
+            grid.appendChild(b);
+        });
+
+        var loading = pending > 0;
+        empty.hidden = loading || list.length > 0;
+        count.textContent = loading ? '⏳ Buscando fotos reales…' :
+            (list.length ? list.length + ' imágenes' + (offline ? ' · sin conexión, mostrando respaldo' : '') : '');
+        credit.hidden = !list.length || offline;
+        credit.textContent = 'Fotos: ' + (USE_GOOGLE ? 'Google Imágenes' : 'Wikimedia Commons (licencias libres)') + '. Toca una foto para ampliarla.';
+
+        var q = norm(input.value.trim());
+        var showCat = LIVE ? null : (cat !== 'all' ? cat : (function () {
+            var hit = Object.keys(CATS).filter(function (k) {
+                return q && (norm(CATS[k].label).indexOf(q) !== -1 || (k === 'futsal' && 'futbol'.indexOf(q) !== -1));
+            });
+            return hit.length === 1 ? hit[0] : null;
+        })());
+        if (showCat) {
+            know.hidden = false; know.textContent = '';
+            var h = document.createElement('h3'); h.textContent = INFO[showCat].title;
+            var p = document.createElement('p'); p.textContent = INFO[showCat].text;
+            know.appendChild(h); know.appendChild(p);
+        } else { know.hidden = true; }
+    }
+
+    function openPanel(btn) {
+        var it = btn._item, wasSame = open === btn;
+        closePanel();
+        if (wasSame) return;
+        open = btn; btn.classList.add('is-open');
+
+        var top = btn.offsetTop, last = btn, n = btn.nextElementSibling;
+        while (n && n.classList.contains('gs-thumb') && n.offsetTop === top) { last = n; n = n.nextElementSibling; }
+
+        var query = queryFor(it);
+        panel = document.createElement('div'); panel.className = 'gs-panel';
+
+        var big = document.createElement('a');
+        big.className = 'gs-big'; big.target = '_blank'; big.rel = 'noopener'; big.title = 'Ver en Google Imágenes';
+        var im = document.createElement('img');
+        im.alt = it.alt; im.referrerPolicy = 'no-referrer';
+        im.onerror = function () { im.onerror = null; im.src = it.src; };   // si la grande falla, usa la miniatura
+        im.src = it.full || it.src;
+        big.appendChild(im);
+
+        var side = document.createElement('div'); side.className = 'gs-side';
+        var h = document.createElement('h4'); h.textContent = it.alt;
+        var tag = document.createElement('span'); tag.className = 'gs-tag';
+        tag.textContent = CATS[it.cat] ? CATS[it.cat].label : 'Resultado';
+        var lab = document.createElement('label'); lab.className = 'gs-size-lab'; lab.textContent = 'Resolución en Google:';
+        var sel = document.createElement('select'); sel.className = 'gs-size';
+        SIZES.forEach(function (s) { var o = document.createElement('option'); o.value = s.v; o.textContent = s.t; sel.appendChild(o); });
+        var go = document.createElement('a');
+        go.className = 'gs-visit'; go.target = '_blank'; go.rel = 'noopener'; go.textContent = 'Ver en Google Imágenes ↗';
+        function upd() { go.href = googleUrl(query, sel.value); big.href = go.href; }
+        sel.addEventListener('change', upd); upd();
+
+        side.appendChild(h); side.appendChild(tag);
+        if (it.page) {
+            var src = document.createElement('a');
+            src.className = 'gs-src'; src.href = it.page; src.target = '_blank'; src.rel = 'noopener';
+            src.textContent = 'Fuente: ' + (it.source || 'original') + ' ↗';
+            side.appendChild(src);
+        }
+        side.appendChild(lab); side.appendChild(sel); side.appendChild(go);
+
+        var x = document.createElement('button');
+        x.type = 'button'; x.className = 'gs-x'; x.setAttribute('aria-label', 'Cerrar'); x.textContent = '✕';
+        x.addEventListener('click', closePanel);
+
+        panel.appendChild(big); panel.appendChild(side); panel.appendChild(x);
+        last.after(panel);
+        panel.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    /* ---------- Eventos ---------- */
+    grid.addEventListener('click', function (e) { var b = e.target.closest('.gs-thumb'); if (b) openPanel(b); });
+
+    tabs.addEventListener('click', function (e) {
+        var t = e.target.closest('.gs-tab'); if (!t) return;
+        cat = t.dataset.cat; LIVE = null; input.value = '';
+        tabs.querySelectorAll('.gs-tab').forEach(function (b) { b.classList.toggle('active', b === t); });
+        render();
+    });
+
+    input.addEventListener('input', function () { if (LIVE) { LIVE = null; } render(); });
+
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var q = input.value.trim();
+        if (!q) { LIVE = null; render(); return; }
+        pending++; LIVE = []; render();
+        fetchPhotos(q).then(function (l) { LIVE = l; offline = false; })
+            .catch(function () { LIVE = []; offline = true; })
+            .then(function () { pending--; render(); });
+        input.blur();
+    });
+
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') closePanel(); });
+    window.addEventListener('resize', closePanel);
+
+    /* Carga perezosa de la sección: busca las fotos al abrir la pestaña por primera vez */
+    function start() {
+        if (started) return; started = true;
+        Object.keys(CATS).forEach(loadCat);
+        render();
+    }
+    document.querySelectorAll('.nav-link[data-sport="buscador"]').forEach(function (a) { a.addEventListener('click', start); });
+    render();
+})();
+
+</script>
 </body>
 </html>
