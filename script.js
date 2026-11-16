@@ -7,11 +7,33 @@ $(document).ready(function() {
                 'C': { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0 }
             },
             canchaSeleccionada: 'A',
+            precioBase: 40,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
             modo: 'individual',
             max: 16
         },
-        futsal: { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0, modo: 'individual', max: 16 },
-        voley: { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0, modo: 'individual', max: 16 }
+        futsal: { 
+            jugadores: [], 
+            timerConfirm: null, 
+            timerOcupado: null, 
+            ocupada: false, 
+            segundosRestantes: 0, 
+            precioBase: 120,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
+            modo: 'individual', 
+            max: 16 
+        },
+        voley: { 
+            jugadores: [], 
+            timerConfirm: null, 
+            timerOcupado: null, 
+            ocupada: false, 
+            segundosRestantes: 0, 
+            precioBase: 80,
+            hidratacion: { nombre: 'Sin pack', precio: 0 },
+            modo: 'individual', 
+            max: 16 
+        }
     };
 
     // 1. EFECTO DE GLOBOS AL HACER CLIC EN ICONOS / BOTONES
@@ -80,9 +102,10 @@ $(document).ready(function() {
     // 5. ENFOQUE DE FOTO EN WALLYS
     $('.cancha-chip').click(function() {
         let letraCancha = $(this).data('cancha');
-        let precioCancha = $(this).data('precio');
+        let precioCancha = parseFloat($(this).data('precio')) || 40;
 
         estadoSistema.wally.canchaSeleccionada = letraCancha;
+        estadoSistema.wally.precioBase = precioCancha;
         $('#lbl-cancha-wally').text(letraCancha);
         $('#input-precio-wally').val(precioCancha);
 
@@ -122,6 +145,26 @@ $(document).ready(function() {
         actualizarCalculos(sport);
     });
 
+    // 7. SELECTOR DE PACK DE HIDRATACIÓN
+    $('.btn-hidra').click(function() {
+        let sport = $(this).data('sport');
+        let precio = parseFloat($(this).data('precio')) || 0;
+        let nombre = $(this).data('nombre');
+
+        $(`.btn-hidra[data-sport="${sport}"]`).removeClass('active');
+        $(this).addClass('active');
+
+        estadoSistema[sport].hidratacion = {
+            nombre: nombre,
+            precio: precio
+        };
+
+        let hidraTexto = precio > 0 ? `${nombre} (+${precio.toFixed(2)} Bs)` : 'Sin pack (0 Bs)';
+        $(`#lbl-hidra-${sport}`).text(hidraTexto);
+
+        actualizarCalculos(sport);
+    });
+
     $('#input-precio-wally').on('input', function() { actualizarCalculos('wally'); });
     $('#input-precio-futsal').on('input', function() { actualizarCalculos('futsal'); });
     $('#input-precio-voley').on('input', function() { actualizarCalculos('voley'); });
@@ -158,22 +201,26 @@ $(document).ready(function() {
             ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada].jugadores 
             : estadoSistema[sport].jugadores;
 
-        let precio = parseFloat($('#input-precio-' + sport).val()) || 0;
+        let inputVal = parseFloat($('#input-precio-' + sport).val());
+        let precioCancha = !isNaN(inputVal) && inputVal > 0 ? inputVal : (estadoSistema[sport].precioBase || 0);
+        let precioHidra = (estadoSistema[sport].hidratacion && estadoSistema[sport].hidratacion.precio) || 0;
+        let precioTotal = precioCancha + precioHidra;
+
         let totalJugadores = jugadores.length;
 
-        let montoTotal = precio.toFixed(2);
+        let montoTotal = precioTotal.toFixed(2);
         $('#monto-total-conjunto-' + sport).text(montoTotal);
         $('#total-jugadores-' + sport).text(totalJugadores);
 
-        if (totalJugadores > 0 && precio > 0) {
-            let cuota = (precio / totalJugadores).toFixed(2);
+        if (totalJugadores > 0 && precioTotal > 0) {
+            let cuota = (precioTotal / totalJugadores).toFixed(2);
             $('#cuota-persona-' + sport).text(cuota);
         } else {
             $('#cuota-persona-' + sport).text('0.00');
         }
 
         if (estadoSistema[sport].modo === 'individual') {
-            let cuotaActual = (totalJugadores > 0 && precio > 0) ? (precio / totalJugadores).toFixed(2) : '0.00';
+            let cuotaActual = (totalJugadores > 0 && precioTotal > 0) ? (precioTotal / totalJugadores).toFixed(2) : '0.00';
             $('#monto-qr-' + sport).text(cuotaActual);
         } else {
             $('#monto-qr-' + sport).text(montoTotal);
@@ -310,7 +357,14 @@ $(document).ready(function() {
         }, 1000);
 
         let detalle = modo === 'conjunto' ? `\nResponsable: ${$(`#nombre-capitan-${sport}`).val()}` : '';
-        alert(`🏆 ¡RESERVA EXITOSA! (${sport.toUpperCase()})${detalle}\nFecha: ${fecha} - Hora: ${hora}`);
+        let hidra = estadoSistema[sport].hidratacion;
+        let detalleHidra = hidra && hidra.precio > 0 
+            ? `\n🥤 Pack Hidratación: ${hidra.nombre} (+${hidra.precio.toFixed(2)} Bs)` 
+            : '\n🥤 Pack Hidratación: Sin pack';
+        let totalReserva = modo === 'conjunto' 
+            ? `${$(`#monto-total-conjunto-${sport}`).text()} Bs` 
+            : `${$(`#cuota-persona-${sport}`).text()} Bs / persona (${subData.jugadores.length} jugadores)`;
+        alert(`🏆 ¡RESERVA EXITOSA! (${sport.toUpperCase()})${detalle}${detalleHidra}\nTotal: ${totalReserva}\nFecha: ${fecha} - Hora: ${hora}`);
     });
 
     $('.pay-btn-mini').click(function() {
@@ -327,6 +381,11 @@ $(document).ready(function() {
         alert("✔ Pago verificado correctamente.");
         $(`#qr-container-${sport}`).slideUp(150);
     });
+
+    // Inicializar cálculos de todos los deportes al cargar
+    actualizarCalculos('wally');
+    actualizarCalculos('futsal');
+    actualizarCalculos('voley');
 });
 /* ===== CARRUSEL (JS puro, 5 imágenes por sección) ===== */
 (function () {

@@ -116,9 +116,11 @@
                         </div>
 
                         <div id="summary-wally" class="summary-box">
+                            <input type="hidden" id="input-precio-wally" value="40">
                             <p>Cancha: <strong class="highlight-text">Wally <span id="lbl-cancha-wally">A</span></strong></p>
                             <p id="row-cuota-wally">Cuota persona: <strong id="cuota-persona-wally">0.00</strong> Bs</p>
                             <p id="row-total-wally" style="display:none;">Monto Total: <strong id="monto-total-conjunto-wally">40.00</strong> Bs</p>
+                            <p id="row-hidra-wally">🥤 Hidratación: <strong id="lbl-hidra-wally" class="highlight-text">Sin pack (0 Bs)</strong></p>
                         </div>
 
                         <div class="carousel" data-carousel="wally" aria-label="Galería wally">
@@ -161,6 +163,34 @@
                     <!-- COL 3: PASARELA -->
                     <div class="col-section">
                         <h4 class="col-title">💳 3. Confirmación</h4>
+
+                        <!-- SELECTOR DE HIDRATACIÓN -->
+                        <div class="hidratacion-container">
+                            <label class="section-sublabel">🥤 Pack Hidratación Deportiva:</label>
+                            <div class="hidratacion-grid" data-sport="wally">
+                                <button type="button" class="btn-hidra active spawn-balloon" data-sport="wally" data-precio="0" data-nombre="Sin pack">
+                                    <span class="hidra-icon">❌</span>
+                                    <span class="hidra-name">Sin pack</span>
+                                    <span class="hidra-badge">0 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="wally" data-precio="10" data-nombre="Pack Agua 6x">
+                                    <span class="hidra-icon">💧</span>
+                                    <span class="hidra-name">Agua 6x</span>
+                                    <span class="hidra-badge">+10 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="wally" data-precio="20" data-nombre="Gatorade 4x">
+                                    <span class="hidra-icon">⚡</span>
+                                    <span class="hidra-name">Gatorade 4x</span>
+                                    <span class="hidra-badge">+20 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="wally" data-precio="35" data-nombre="Team Pro">
+                                    <span class="hidra-icon">🏆</span>
+                                    <span class="hidra-name">Team Pro</span>
+                                    <span class="hidra-badge">+35 Bs</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="payment-mini-options">
                             <button class="pay-btn-mini active-pay spawn-balloon" data-sport="wally" data-method="qr">📲 QR</button>
                             <button class="pay-btn-mini spawn-balloon" data-sport="wally" data-method="efectivo">💵 Efectivo</button>
@@ -228,8 +258,10 @@
                         </div>
 
                         <div id="summary-futsal" class="summary-box">
+                            <input type="hidden" id="input-precio-futsal" value="120">
                             <p id="row-cuota-futsal">Cuota: <strong id="cuota-persona-futsal">0.00</strong> Bs</p>
                             <p id="row-total-futsal" style="display:none;">Total Cancha: <strong id="monto-total-conjunto-futsal">120.00</strong> Bs</p>
+                            <p id="row-hidra-futsal">🥤 Hidratación: <strong id="lbl-hidra-futsal" class="highlight-text">Sin pack (0 Bs)</strong></p>
                         </div>
 
                         <div class="carousel" data-carousel="futsal" aria-label="Galería futsal">
@@ -269,6 +301,34 @@
 
                     <div class="col-section">
                         <h4 class="col-title">💳 3. Confirmación</h4>
+
+                        <!-- SELECTOR DE HIDRATACIÓN -->
+                        <div class="hidratacion-container">
+                            <label class="section-sublabel">🥤 Pack Hidratación Deportiva:</label>
+                            <div class="hidratacion-grid" data-sport="futsal">
+                                <button type="button" class="btn-hidra active spawn-balloon" data-sport="futsal" data-precio="0" data-nombre="Sin pack">
+                                    <span class="hidra-icon">❌</span>
+                                    <span class="hidra-name">Sin pack</span>
+                                    <span class="hidra-badge">0 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="futsal" data-precio="10" data-nombre="Pack Agua 6x">
+                                    <span class="hidra-icon">💧</span>
+                                    <span class="hidra-name">Agua 6x</span>
+                                    <span class="hidra-badge">+10 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="futsal" data-precio="20" data-nombre="Gatorade 4x">
+                                    <span class="hidra-icon">⚡</span>
+                                    <span class="hidra-name">Gatorade 4x</span>
+                                    <span class="hidra-badge">+20 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="futsal" data-precio="35" data-nombre="Team Pro">
+                                    <span class="hidra-icon">🏆</span>
+                                    <span class="hidra-name">Team Pro</span>
+                                    <span class="hidra-badge">+35 Bs</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="payment-mini-options">
                             <button class="pay-btn-mini active-pay spawn-balloon" data-sport="futsal" data-method="qr">📲 QR</button>
                             <button class="pay-btn-mini spawn-balloon" data-sport="futsal" data-method="efectivo">💵 Efectivo</button>
@@ -335,8 +395,10 @@
                         </div>
 
                         <div id="summary-voley" class="summary-box">
+                            <input type="hidden" id="input-precio-voley" value="80">
                             <p id="row-cuota-voley">Cuota: <strong id="cuota-persona-voley">0.00</strong> Bs</p>
                             <p id="row-total-voley" style="display:none;">Total Cancha: <strong id="monto-total-conjunto-voley">80.00</strong> Bs</p>
+                            <p id="row-hidra-voley">🥤 Hidratación: <strong id="lbl-hidra-voley" class="highlight-text">Sin pack (0 Bs)</strong></p>
                         </div>
 
                         <div class="carousel" data-carousel="voley" aria-label="Galería voley">
@@ -376,6 +438,34 @@
 
                     <div class="col-section">
                         <h4 class="col-title">💳 3. Confirmación</h4>
+
+                        <!-- SELECTOR DE HIDRATACIÓN -->
+                        <div class="hidratacion-container">
+                            <label class="section-sublabel">🥤 Pack Hidratación Deportiva:</label>
+                            <div class="hidratacion-grid" data-sport="voley">
+                                <button type="button" class="btn-hidra active spawn-balloon" data-sport="voley" data-precio="0" data-nombre="Sin pack">
+                                    <span class="hidra-icon">❌</span>
+                                    <span class="hidra-name">Sin pack</span>
+                                    <span class="hidra-badge">0 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="voley" data-precio="10" data-nombre="Pack Agua 6x">
+                                    <span class="hidra-icon">💧</span>
+                                    <span class="hidra-name">Agua 6x</span>
+                                    <span class="hidra-badge">+10 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="voley" data-precio="20" data-nombre="Gatorade 4x">
+                                    <span class="hidra-icon">⚡</span>
+                                    <span class="hidra-name">Gatorade 4x</span>
+                                    <span class="hidra-badge">+20 Bs</span>
+                                </button>
+                                <button type="button" class="btn-hidra spawn-balloon" data-sport="voley" data-precio="35" data-nombre="Team Pro">
+                                    <span class="hidra-icon">🏆</span>
+                                    <span class="hidra-name">Team Pro</span>
+                                    <span class="hidra-badge">+35 Bs</span>
+                                </button>
+                            </div>
+                        </div>
+
                         <div class="payment-mini-options">
                             <button class="pay-btn-mini active-pay spawn-balloon" data-sport="voley" data-method="qr">📲 QR</button>
                             <button class="pay-btn-mini spawn-balloon" data-sport="voley" data-method="efectivo">💵 Efectivo</button>

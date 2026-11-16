@@ -404,6 +404,65 @@ body {
 .btn-check-asistencia.confirmado { background: #3b82f6; color: white; }
 .btn-check-pago.pagado { background: #10b981; color: white; }
 
+/* SELECTOR DE HIDRATACIÓN */
+.hidratacion-container {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    margin-bottom: 2px;
+}
+.hidratacion-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 4px;
+}
+.btn-hidra {
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+    padding: 4px 6px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    font-size: 10px;
+    font-family: 'Rajdhani', sans-serif;
+    font-weight: 700;
+    transition: all 0.2s ease;
+}
+.btn-hidra:hover {
+    border-color: var(--active-accent);
+}
+.btn-hidra.active {
+    background: var(--active-gradient);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px var(--active-glow);
+}
+.btn-hidra .hidra-icon {
+    font-size: 11px;
+}
+.btn-hidra .hidra-name {
+    flex: 1;
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.btn-hidra .hidra-badge {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-size: 8.5px;
+    font-weight: 800;
+}
+.btn-hidra.active .hidra-badge {
+    background: rgba(255, 255, 255, 0.25);
+    color: #ffffff;
+}
+
 /* PASARELA */
 .payment-mini-options { display: flex; gap: 5px; }
 .pay-btn-mini {

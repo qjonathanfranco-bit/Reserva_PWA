@@ -1,4 +1,4 @@
-const CACHE = 'deporzone-v5';
+const CACHE = 'deporzone-v6';
 const ASSETS = [
   './', './index.html', './styles.css', './script.js', './carousel-data.js', './buscador.js', './manifest.json',
   './img/vol/A.jpeg', './img/vol/B.jpeg', './img/vol/C.jpeg', './img/vol/CANCHA.jpeg',
