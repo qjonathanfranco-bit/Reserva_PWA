@@ -16,27 +16,29 @@ PWA para reservar canchas de volleyball (Wally), wallyball y futsal. Con carouse
 
 ## Base de datos (Supabase)
 
-La app sigue usando PostgreSQL, pero ahora se conecta a **Supabase** mediante un connection string.
+La app usa PostgreSQL en **Supabase** a través de su API REST (PostgREST), con la clave publishable. Ya no hace falta PostgreSQL instalado en la máquina.
 
-1. En Supabase entra en **Project Settings → Database → Connection string**, pestaña **URI / Session**, y copia la cadena (sustituye `[YOUR-PASSWORD]` por la contraseña del proyecto).
-2. Copia la plantilla y pega tu cadena:
+1. En Supabase ve a **SQL Editor**, pega todo el contenido de **`supabase_schema.sql`** y pulsa **Run**. Eso crea las 7 tablas y sus políticas de acceso.
+2. El archivo `.env` ya contiene:
    ```
-   copy .env.example .env
+   SUPABASE_URL=https://<tu-ref>.supabase.co
+   SUPABASE_KEY=sb_publishable_...
    ```
-   Edita `.env` y deja `DATABASE_URL=postgresql://postgres:...`. El archivo `.env` está en `.gitignore`: **no lo subas a Git**.
-3. Crea las tablas y los datos iniciales en Supabase:
+   (Está en `.gitignore`: no lo subas a Git. La clave publishable se puede regenerar en Project Settings → API Keys.)
+3. Llena los datos iniciales y trae tus datos anteriores:
    ```
-   python seed_db.py
+   python seed_db.py           -> datos base (admin / volleybol)
+   python migrate_data.py import -> usuarios, reservas y precios desde volleybol_backup.json
    ```
-   Usuario por defecto: `admin` / contraseña `volleybol`.
-4. **Si vienes del PostgreSQL local** y quieres conservar usuarios, reservas y precios:
-   ```
-   python migrate_data.py export   -> volleybol_backup.json (ya generado)
-   python seed_db.py               -> crea el schema en Supabase
-   python migrate_data.py import   -> vuelca tus datos a Supabase
-   ```
+4. Arranca el backend con `python backend.py`; verás `[Volleybol] Supabase: <tu-ref>.supabase.co`.
 
-Al arrancar el backend verás `[Volleybol] Base de datos: ...` con el destino real (la contraseña se oculta). Si no hay `.env`, se usa el PostgreSQL local anterior como respaldo.
+> Nota de seguridad: las políticas del schema permiten acceso total al rol `anon` porque la app es una demo. Si publicas la app, cambia esas políticas por autenticación real.
+
+### Despliegue en GitHub Pages
+
+La PWA llama **directamente a Supabase REST** (`js/supabase.js`) con la clave publishable, así que funciona como sitio estático: no necesita `backend.py` ni PostgreSQL local. Simplemente sube la carpeta a GitHub y activa **Pages** (rama `main`, carpeta `/root`). El backend Flask sigue sirviendo para desarrollo local en `http://127.0.0.1:5000/`.
+
+Si haces cambios, recuerda subir también `js/supabase.js` y incrementar `CACHE` en `sw.js` para que los visitantes recarguen la versión nueva.
 
 ## Cómo probar
 

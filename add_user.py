@@ -1,22 +1,19 @@
-"""add_user.py — Añade un nuevo usuario (y contraseña) a la base de datos :volleybol:.
+"""add_user.py — Añade un nuevo usuario a Supabase (API REST).
 
 Uso: python add_user.py            (pide usuario y contraseña)
-     python add_user.py usuario   (pide solo la contraseña)
+     python add_user.py usuario    (pide solo la contraseña)
 """
 from getpass import getpass
 
-from db import connect, hash_password
+from db import get_usuario, hash_password, insert_usuario
 
 
 def add_user(username, password):
-    with connect() as conn, conn.cursor() as cur:
-        cur.execute(
-            "INSERT INTO usuarios (username, password_hash, activo) VALUES (%s, %s, true) "
-            "ON CONFLICT (username) DO NOTHING",
-            (username, hash_password(password)),
-        )
-        n = cur.rowcount
-    return n
+    """Devuelve True si se creó el usuario."""
+    if get_usuario(username):
+        return False
+    cod, _ = insert_usuario(username, hash_password(password))
+    return cod < 400
 
 
 def main():
@@ -42,9 +39,8 @@ def main():
         print("La contraseña no puede estar vacía.")
         return 1
 
-    added = add_user(username, password)
-    if added:
-        print(f"✔ Usuario '{username}' añadido a la base de datos.")
+    if add_user(username, password):
+        print(f"✔ Usuario '{username}' añadido a Supabase.")
         return 0
     print(f"⚠ El usuario '{username}' ya existe (se salta).")
     return 0

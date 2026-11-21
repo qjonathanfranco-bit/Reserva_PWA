@@ -1,6 +1,6 @@
-const CACHE = 'deporzone-v18';
+const CACHE = 'deporzone-v20';
 const ASSETS = [
-  './', './index.html', './css/styles.css', './js/script.js', './js/carousel-data.js', './js/buscador.js', './manifest.json',
+  './', './index.html', './css/styles.css', './js/script.js', './js/supabase.js', './js/carousel-data.js', './js/buscador.js', './manifest.json',
   './img/vol/A.jpeg', './img/vol/B.jpeg', './img/vol/C.jpeg', './img/vol/CANCHA.jpeg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './img/galeria/wally-01.svg',

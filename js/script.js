@@ -1,18 +1,6 @@
 $(document).ready(function() {
 
-    /* ===== URL de la API =====
-       El backend Flask sirve la página y la API en el puerto 5000. Si abres el
-       index.html desde otro sitio (p. ej. `python -m http.server 8123`, que es
-       lo que decía el README) o directamente como archivo, las rutas relativas
-       '/api/...' van al servidor equivocado y el login/registro fallan.
-       Apuntamos siempre las peticiones al backend, respetando el host actual. */
-    var BACKEND_ORIGIN = '';
-    if (location.protocol === 'http:' || location.protocol === 'https:') {
-        if (location.port !== '5000') BACKEND_ORIGIN = location.protocol + '//' + location.hostname + ':5000';
-    } else {
-        BACKEND_ORIGIN = 'http://127.0.0.1:5000'; // abierto como archivo (file://)
-    }
-    function apiUrl(ruta) { return BACKEND_ORIGIN + ruta; }
+    /* ===== Datos: Supabase REST directo (funciona también en GitHub Pages) ===== */
     /* ===== Estado del sistema (lógica de la app) ===== */
     let estadoSistema = {
         wally: {
@@ -40,8 +28,7 @@ $(document).ready(function() {
     var HORAS_RESERVA = { wally: 1, futsal: 1, voley: 1 };
 
     function fetchCanchas() {
-        fetch(apiUrl('/api/canchas'))
-            .then(function (r) { return r.json(); })
+        SUPA.canchas()
             .then(function (data) {
                 DB_CANCHAS.wally = data.filter(function (c) { return c.sport_id === 'wally' && c.estado; });
                 DB_CANCHAS.futsal = data.filter(function (c) { return c.sport_id === 'futsal' && c.estado; });
@@ -53,8 +40,7 @@ $(document).ready(function() {
     }
 
     function fetchSlots() {
-        fetch(apiUrl('/api/slots'))
-            .then(function (r) { return r.json(); })
+        SUPA.slots()
             .then(function (data) {
                 ['wally', 'futsal', 'voley'].forEach(function (s) {
                     DB_SLOTS[s] = data.filter(function (x) { return x.sport_id === s; });
@@ -65,15 +51,13 @@ $(document).ready(function() {
     }
 
     function fetchMetadatos() {
-        fetch(apiUrl('/api/metadatos'))
-            .then(function (r) { return r.json(); })
+        SUPA.metadatos()
             .then(function (data) { DB_META = data; })
             .catch(function (e) { console.warn('metadatos: no se pudo conectar con la API', e); });
     }
 
     function fetchReservas(sport) {
-        fetch(apiUrl('/api/reservas?sport=' + sport))
-            .then(function (r) { return r.json(); })
+        SUPA.reservas(sport)
             .then(function (data) {
                 var st = estadoSistema[sport];
                 st.reservas.length = 0;
@@ -143,12 +127,7 @@ $(document).ready(function() {
         var pass = $('#login-pass').val();
         var msg = $('#login-msg');
         msg.removeClass('err').text('Iniciando sesión…').show();
-        fetch(apiUrl('/api/login'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, password: pass })
-        })
-        .then(function (r) { return r.json(); })
+        SUPA.login(user, pass)
         .then(function (j) {
             if (j.ok) {
                 window.__usuario = j.usuario;
@@ -160,7 +139,7 @@ $(document).ready(function() {
                 msg.addClass('err').text(j.msg || 'Credenciales inválidas').show();
             }
         })
-        .catch(function () { msg.addClass('err').text('✘ No se pudo conectar con el servidor (¿está corriendo backend.py?)').show(); });
+        .catch(function (e) { msg.addClass('err').text('✘ No se pudo conectar con Supabase: ' + (e.message || '')).show(); });
     }
     $('#btn-login').click(loginConBase);
 
@@ -176,12 +155,7 @@ $(document).ready(function() {
         if (!user || !pass) { msg.addClass('err').text('Ingresa usuario y contraseña').show(); return; }
         if (pass !== confirm) { msg.addClass('err').text('La confirmación no coincide').show(); return; }
         msg.removeClass('err').text('Registrando…').show();
-        fetch(apiUrl('/api/registrar'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ username: user, password: pass, confirm: confirm })
-        })
-        .then(function (r) { return r.json(); })
+        SUPA.registrar(user, pass)
         .then(function (j) { msg.removeClass('err').text(j.msg || 'Ok').show(); })
         .catch(function () { msg.addClass('err').text('✘ Error al registrar').show(); });
     });
@@ -220,11 +194,7 @@ $(document).ready(function() {
         }
         msg.removeClass('err').text('Guardando…').show();
         Promise.all(cambios.map(function (c) {
-            return fetch(apiUrl('/api/canchas/' + encodeURIComponent(c.id)), {
-                method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ precio: c.precio })
-            }).then(function (r) { return r.json(); }).catch(function () { return { ok: false }; });
+            return SUPA.cambiarPrecio(c.id, c.precio).catch(function () { return { ok: false }; });
         })).then(function (resultados) {
             if (resultados.some(function (j) { return !j.ok; })) {
                 msg.addClass('err').text('No se pudieron guardar todos los precios.').show();
@@ -396,7 +366,7 @@ $(document).ready(function() {
     $(document).on('click', '.btn-res-borrar', function () {
         var sport = $(this).data('sport');
         var id = $(this).data('id');
-        fetch(apiUrl('/api/reservas/' + id), { method: 'DELETE' })
+        SUPA.borrarReserva(id)
             .then(function () { fetchReservas(sport); })
             .catch(function () { console.warn('reservas: no se pudo conectar con la API'); });
     });
@@ -406,7 +376,7 @@ $(document).ready(function() {
         var sport = this.id.replace('btn-res-limpiar-', '');
         var ids = reservasDeSport(sport).map(function (r) { return r.id; }).filter(function (id) { return id; });
         Promise.all(ids.map(function (id) {
-            return fetch(apiUrl('/api/reservas/' + id), { method: 'DELETE' }).then(function () { return true; }).catch(function () { return false; });
+            return SUPA.borrarReserva(id).then(function () { return true; }).catch(function () { return false; });
         })).then(function () { fetchReservas(sport); });
     });
 
@@ -637,12 +607,7 @@ $(document).ready(function() {
         // A la base de datos si ya existe una reserva creada via API
         var reservaId = estadoSistema[sport].ultimaReservaId;
         if (reservaId) {
-            fetch(apiUrl('/api/reservas/' + reservaId + '/jugadores'), {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre: nombre, confirmado: false, pagado: false })
-            })
-            .then(function (r) { return r.json(); })
+            SUPA.crearJugador(reservaId, nombre, false, false)
             .then(function (j) { if (j.ok && j.id) { anadir(j.id); return; } anadir(); })
             .catch(function () { anadir(); });
         } else {
@@ -682,10 +647,8 @@ $(document).ready(function() {
         subData.jugadores[i].confirmado = !subData.jugadores[i].confirmado;
         renderizarLista(sport);
         if (subData.jugadores[i].id) {
-            fetch(apiUrl('/api/jugadores/' + subData.jugadores[i].id), {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ confirmado: subData.jugadores[i].confirmado })
-            }).catch(function () {});
+            SUPA.actualizarJugador(subData.jugadores[i].id, { confirmado: subData.jugadores[i].confirmado })
+                .catch(function () {});
         }
     });
 
@@ -696,10 +659,8 @@ $(document).ready(function() {
         subData.jugadores[i].pagado = !subData.jugadores[i].pagado;
         renderizarLista(sport);
         if (subData.jugadores[i].id) {
-            fetch(apiUrl('/api/jugadores/' + subData.jugadores[i].id), {
-                method: 'PATCH', headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ pagado: subData.jugadores[i].pagado })
-            }).catch(function () {});
+            SUPA.actualizarJugador(subData.jugadores[i].id, { pagado: subData.jugadores[i].pagado })
+                .catch(function () {});
         }
     });
 
@@ -804,19 +765,14 @@ $(document).ready(function() {
         let detalle = modo === 'conjunto' ? `\nResponsable: ${$(`#nombre-capitan-${sport}`).val()}` : '';
 
         // Registrar la reserva en la base de datos (POST /api/reservas)
-        fetch(apiUrl('/api/reservas'), {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                cancha: sport === 'wally' ? estadoSistema.wally.canchaSeleccionada : (DB_CANCHAS[sport][0] ? DB_CANCHAS[sport][0].id : ''),
-                fecha: fecha,
-                hora_entrada: hora,
-                hora_salida: horaSalida,
-                estado: 'Activa',
-                usuario_id: window.__usuarioId || null
-            })
+        SUPA.crearReserva({
+            cancha_id: sport === 'wally' ? estadoSistema.wally.canchaSeleccionada : (DB_CANCHAS[sport][0] ? DB_CANCHAS[sport][0].id : ''),
+            fecha: fecha,
+            hora_entrada: hora,
+            hora_salida: horaSalida,
+            estado: 'Activa',
+            usuario_id: window.__usuarioId || null
         })
-        .then(function (r) { return r.json(); })
         .then(function (j) {
             if (!j.ok) { alert('✘ ' + (j.msg || 'No se pudo crear la reserva')); return; }
             estadoSistema[sport].ultimaReservaId = j.id;
@@ -824,7 +780,7 @@ $(document).ready(function() {
             actualizarHorariosDisponibles(sport);
             alert(`🏆 ¡RESERVA EXITOSA! (${sport.toUpperCase()})${detalle}\nFecha: ${fecha} - Hora: ${hora} a ${horaSalida} (${horas}h)\nTotal: ${precioDeSport(sport) * horas} Bs`);
         })
-        .catch(function () { alert('✘ No se pudo conectar con el servidor (¿está corriendo backend.py?)'); });
+        .catch(function (e) { alert('✘ No se pudo conectar con Supabase: ' + (e.message || '')); });
     });
 
     $('.pay-btn-mini').click(function() {

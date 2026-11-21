@@ -1,4 +1,4 @@
-"""login.py — Mini login: valida usuario + contraseña contra PostgreSQL (DB :volleybol:).
+"""login.py — Valida usuario + contraseña contra Supabase (API REST).
 
 Uso:
   python login.py                      # pide usuario y contraseña
@@ -6,22 +6,15 @@ Uso:
 """
 import sys
 
-from db import connect, verify_password
+from db import get_usuario, verify_password
 
 
 def login(username, password):
-    """Devuelve True si el usuario/contraseña son válidos y activo."""
-    with connect() as conn, conn.cursor() as cur:
-        cur.execute(
-            "SELECT username, password_hash, activo FROM usuarios WHERE username = %s",
-            (username,),
-        )
-        row = cur.fetchone()
-    if row is None:
+    """Devuelve True si el usuario/contraseña son válidos y está activo."""
+    fila = get_usuario(username)
+    if not fila or not fila.get("activo"):
         return False
-    if not row["activo"]:
-        return False
-    return verify_password(password, row["password_hash"])
+    return verify_password(password, fila["password_hash"])
 
 
 def main():
@@ -35,7 +28,7 @@ def main():
         print("✘ El usuario no puede estar vacío.")
         return 1
     if login(username, password):
-        print(f"✔ ¡Bienvenido, {username}! (DB Volleybol)")
+        print(f"✔ ¡Bienvenido, {username}! (Supabase)")
         return 0
     print("✘ Credenciales inválidas (usuario/contraseña no encontradas o no activas).")
     return 1
