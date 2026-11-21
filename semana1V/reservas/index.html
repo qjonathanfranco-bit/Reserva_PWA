@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reservas · DeporZone</title>
+    <!-- Rutas relativas: funcionan en https://usuario.github.io/repo/reservas/ -->
+    <link rel="stylesheet" href="reserva.css">
+    <style>
+        /* Solo para la demo aislada; no forma parte del componente */
+        .pagina-demo { margin: 0; padding: 16px; background: #030712; min-height: 100vh; }
+    </style>
+</head>
+<body class="pagina-demo">
+
+    <section class="reserva-modulo" aria-labelledby="reserva-titulo">
+        <h2 class="reserva-modulo__titulo" id="reserva-titulo">Reserva tu cancha</h2>
+        <p class="reserva-modulo__sub">Completa tus datos y elige un horario.</p>
+        <ul class="reserva-modulo__lista"></ul>
+
+        <!-- Plantilla base: se clona una vez por cada objeto de RESERVA_DATOS -->
+        <template>
+            <article class="reserva-card" data-id="">
+                <header class="reserva-card__cabecera">
+                    <div>
+                        <h3 class="reserva-card__nombre" data-campo="nombre-espacio"></h3>
+                        <p class="reserva-card__detalle" data-campo="detalle"></p>
+                    </div>
+                    <span class="reserva-card__precio" data-campo="precio"></span>
+                </header>
+
+                <span class="reserva-card__estado" data-campo="estado" role="status"></span>
+
+                <form class="reserva-card__form" novalidate>
+                    <label class="reserva-card__campo" data-for="nombre">Nombre
+                        <input class="reserva-card__input" name="nombre" type="text" maxlength="40" autocomplete="name">
+                    </label>
+                    <label class="reserva-card__campo" data-for="correo">Correo
+                        <input class="reserva-card__input" name="correo" type="email" autocomplete="email">
+                    </label>
+                    <label class="reserva-card__campo" data-for="fecha">Fecha
+                        <input class="reserva-card__input" name="fecha" type="date">
+                    </label>
+                    <label class="reserva-card__campo" data-for="hora">Horario
+                        <select class="reserva-card__input" name="hora">
+                            <option value="">Selecciona…</option>
+                        </select>
+                    </label>
+                    <p class="reserva-card__mensaje" data-campo="mensaje" role="alert"></p>
+                    <div class="reserva-card__acciones">
+                        <button type="button" class="reserva-card__boton" data-accion="reservar">Reservar</button>
+                        <button type="button" class="reserva-card__boton reserva-card__boton--sec" data-accion="simular">Simular reserva</button>
+                        <button type="button" class="reserva-card__boton reserva-card__boton--sec" data-accion="cancelar" hidden>Cancelar</button>
+                    </div>
+                </form>
+            </article>
+        </template>
+    </section>
+
+    <script src="reserva-datos.js"></script>
+    <script src="reserva.js"></script>
+</body>
+</html>

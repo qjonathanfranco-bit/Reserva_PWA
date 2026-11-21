@@ -1,68 +1,4 @@
 $(document).ready(function() {
-    // ==========================================
-    // 0. REGISTRO DE SERVICE WORKER (PWA)
-    // ==========================================
-    if ('serviceWorker' in navigator) {
-        window.addEventListener('load', function() {
-            navigator.serviceWorker.register('./sw.js')
-                .then(function(reg) {
-                    console.log('✅ DeporZone Service Worker activo:', reg.scope);
-                })
-                .catch(function(err) {
-                    console.warn('⚠️ Fallo de Service Worker:', err);
-                });
-        });
-    }
-
-    // ==========================================
-    // 0.1 CONTROL DE INSTALACIÓN PWA (MÓVILES Y DESKTOP)
-    // ==========================================
-    let deferredInstallPrompt = null;
-    const $installBtn = $('#pwa-install-btn');
-
-    window.addEventListener('beforeinstallprompt', function(e) {
-        e.preventDefault();
-        deferredInstallPrompt = e;
-        $installBtn.css('display', 'inline-flex').fadeIn(250);
-    });
-
-    $installBtn.click(async function() {
-        if (deferredInstallPrompt) {
-            deferredInstallPrompt.prompt();
-            const choice = await deferredInstallPrompt.userChoice;
-            if (choice.outcome === 'accepted') {
-                $installBtn.hide();
-            }
-            deferredInstallPrompt = null;
-        } else {
-            alert("📲 Para instalar DeporZone en tu celular:\n\n• En Android (Chrome): Toca el menú (⋮) arriba a la derecha y selecciona 'Instalar aplicación' o 'Agregar a la pantalla principal'.\n• En iPhone (Safari): Toca el botón Compartir (⎋) abajo y selecciona 'Agregar a pantalla de inicio' (➕).");
-        }
-    });
-
-    window.addEventListener('appinstalled', function() {
-        $installBtn.hide();
-        deferredInstallPrompt = null;
-    });
-
-    // Detectar iOS Safari para mostrar banner de instalación
-    const isIosDevice = () => {
-        const ua = window.navigator.userAgent.toLowerCase();
-        return /iphone|ipad|ipod/.test(ua);
-    };
-    const isStandalone = () => ('standalone' in window.navigator && window.navigator.standalone) || window.matchMedia('(display-mode: standalone)').matches;
-
-    if (isIosDevice() && !isStandalone() && !sessionStorage.getItem('deporzone_ios_banner_closed')) {
-        $('#ios-pwa-banner').slideDown(250);
-    }
-
-    $('#btn-close-ios-banner').click(function() {
-        $('#ios-pwa-banner').slideUp(200);
-        sessionStorage.setItem('deporzone_ios_banner_closed', 'true');
-    });
-
-    // ==========================================
-    // 1. ESTADO DEL SISTEMA
-    // ==========================================
     let estadoSistema = {
         wally: {
             subCanchas: {
@@ -71,64 +7,27 @@ $(document).ready(function() {
                 'C': { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0 }
             },
             canchaSeleccionada: 'A',
-            precioBase: 40,
-            hidratacion: { nombre: 'Sin pack', precio: 0 },
             modo: 'individual',
             max: 16
         },
-        futsal: { 
-            jugadores: [], 
-            timerConfirm: null, 
-            timerOcupado: null, 
-            ocupada: false, 
-            segundosRestantes: 0, 
-            precioBase: 120,
-            hidratacion: { nombre: 'Sin pack', precio: 0 },
-            modo: 'individual', 
-            max: 16 
-        },
-        voley: { 
-            jugadores: [], 
-            timerConfirm: null, 
-            timerOcupado: null, 
-            ocupada: false, 
-            segundosRestantes: 0, 
-            precioBase: 80,
-            hidratacion: { nombre: 'Sin pack', precio: 0 },
-            modo: 'individual', 
-            max: 16 
-        }
+        futsal: { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0, modo: 'individual', max: 16 },
+        voley: { jugadores: [], timerConfirm: null, timerOcupado: null, ocupada: false, segundosRestantes: 0, modo: 'individual', max: 16 }
     };
 
-    // Pre-llenar fecha con hoy en formato YYYY-MM-DD
-    const hoyStr = new Date().toISOString().split('T')[0];
-    $('#fecha-wally, #fecha-futsal, #fecha-voley').val(hoyStr);
-
-    // ==========================================
-    // 2. EFECTO DE GLOBOS TÁCTIL Y CLIC
-    // ==========================================
-    const emojilist = ['🎈', '🎉', '⚡', '🏐', '⚽', '🏆', '⭐'];
+    // 1. EFECTO DE GLOBOS AL HACER CLIC EN ICONOS / BOTONES
+    const emojilist = ['🎈', '🎈', '🎉', '💥', '⭐', '🏐', '⚽', '🏆'];
 
     $(document).on('click', '.spawn-balloon, .cancha-chip, .btn-modo, .slot-btn, .nav-link', function(e) {
         let posX = e.clientX;
         let posY = e.clientY;
 
-        // Fallback táctil o si se dispara por teclado/accesibilidad
-        if (!posX || !posY) {
-            let rect = this.getBoundingClientRect();
-            posX = rect.left + rect.width / 2;
-            posY = rect.top + rect.height / 2;
-        }
-
-        const isMobileScreen = window.innerWidth <= 768;
-        const count = isMobileScreen ? 2 : 3;
-
-        for (let i = 0; i < count; i++) {
+        // Crear 3 globos/burbujas por clic
+        for (let i = 0; i < 3; i++) {
             let randomEmoji = emojilist[Math.floor(Math.random() * emojilist.length)];
             let $balloon = $('<div class="floating-balloon"></div>').text(randomEmoji);
 
-            let offsetX = (Math.random() - 0.5) * 35;
-            let offsetY = (Math.random() - 0.5) * 15;
+            let offsetX = (Math.random() - 0.5) * 40;
+            let offsetY = (Math.random() - 0.5) * 20;
 
             $balloon.css({
                 left: (posX + offsetX) + 'px',
@@ -143,52 +42,30 @@ $(document).ready(function() {
         }
     });
 
-    // ==========================================
-    // 3. TEMA OSCURO / CLARO CON PERSISTENCIA
-    // ==========================================
-    const savedTheme = localStorage.getItem('deporzone_theme');
-    if (savedTheme === 'light') {
-        $('body').addClass('light-theme');
-        $('#theme-toggle').html('☀️ <span class="theme-text">Modo Claro</span>');
-        $('#meta-theme-color').attr('content', '#f1f5f9');
-    }
-
+    // 2. TOGGLE MODO OSCURO Y CLARO (CORREGIDO)
     $('#theme-toggle').click(function() {
         $('body').toggleClass('light-theme');
-        const isLight = $('body').hasClass('light-theme');
-        if (isLight) {
-            $(this).html('☀️ <span class="theme-text">Modo Claro</span>');
-            localStorage.setItem('deporzone_theme', 'light');
-            $('#meta-theme-color').attr('content', '#f1f5f9');
+        if ($('body').hasClass('light-theme')) {
+            $(this).text('☀️ Modo Claro');
         } else {
-            $(this).html('🌙 <span class="theme-text">Modo Oscuro</span>');
-            localStorage.setItem('deporzone_theme', 'dark');
-            $('#meta-theme-color').attr('content', '#030712');
+            $(this).text('🌙 Modo Oscuro');
         }
     });
 
-    // ==========================================
-    // 4. NAVEGACIÓN ENTRE SECCIONES / DEPORTES
-    // ==========================================
+    // 3. NAVEGACIÓN ENTRE DEPORTES
     $('.nav-link').click(function(e) {
         e.preventDefault();
         $('.nav-link').removeClass('active');
         $(this).addClass('active');
 
         let sport = $(this).data('sport');
-        $('body').removeClass('theme-wally theme-futsal theme-voley theme-buscador').addClass('theme-' + sport);
+        $('body').removeClass('theme-wally theme-futsal theme-voley').addClass('theme-' + sport);
 
         $('.content-section').hide();
         $('#' + sport).fadeIn(200);
-
-        if (sport !== 'buscador') {
-            actualizarCalculos(sport);
-        }
     });
 
-    // ==========================================
-    // 5. SLOTS DE HORARIO
-    // ==========================================
+    // 4. SELECCIÓN DE SLOTS DE HORARIO
     $('.slot-btn').click(function() {
         if ($(this).hasClass('ocupado')) return;
 
@@ -200,33 +77,28 @@ $(document).ready(function() {
         $('#hora-' + sport).val(horaSeleccionada);
     });
 
-    // ==========================================
-    // 6. SELECCIÓN DE CANCHAS (WALLY)
-    // ==========================================
+    // 5. ENFOQUE DE FOTO EN WALLYS
     $('.cancha-chip').click(function() {
         let letraCancha = $(this).data('cancha');
-        let precioCancha = parseFloat($(this).data('precio')) || 40;
+        let precioCancha = $(this).data('precio');
 
         estadoSistema.wally.canchaSeleccionada = letraCancha;
-        estadoSistema.wally.precioBase = precioCancha;
         $('#lbl-cancha-wally').text(letraCancha);
         $('#input-precio-wally').val(precioCancha);
 
-        // Todas las canchas se mantienen visibles; sólo se actualiza la seleccionada
-        $('.cancha-chip').removeClass('selected');
-        $(this).addClass('selected');
+        $('.cancha-chip').addClass('hidden');
+        $(this).removeClass('hidden').addClass('selected');
+        $('#btn-ver-todas-wally').fadeIn();
 
         sincronizarVistaWally();
     });
 
     $('#btn-ver-todas-wally').click(function() {
         $('.cancha-chip').removeClass('hidden');
-        $(this).fadeOut(150);
+        $(this).fadeOut();
     });
 
-    // ==========================================
-    // 7. SELECTOR MODO INDIVIDUAL VS CONJUNTO
-    // ==========================================
+    // 6. SELECTOR MODO INDIVIDUAL VS CONJUNTO
     $('.btn-modo').click(function() {
         let sport = $(this).data('sport');
         let modo = $(this).data('modo');
@@ -250,32 +122,9 @@ $(document).ready(function() {
         actualizarCalculos(sport);
     });
 
-    // ==========================================
-    // 8. SELECTOR DE PACK DE HIDRATACIÓN
-    // ==========================================
-    $('.btn-hidra').click(function() {
-        let sport = $(this).data('sport');
-        let precio = parseFloat($(this).data('precio')) || 0;
-        let nombre = $(this).data('nombre');
-
-        $(`.btn-hidra[data-sport="${sport}"]`).removeClass('active');
-        $(this).addClass('active');
-
-        estadoSistema[sport].hidratacion = {
-            nombre: nombre,
-            precio: precio
-        };
-
-        let hidraTexto = precio > 0 ? `${nombre} (+${precio.toFixed(2)} Bs)` : 'Sin pack (0 Bs)';
-        $(`#lbl-hidra-${sport}`).text(hidraTexto);
-
-        actualizarCalculos(sport);
-    });
-
-    $('#input-precio-wally, #input-precio-futsal, #input-precio-voley').on('input change', function() {
-        let sport = $(this).attr('id').replace('input-precio-', '');
-        actualizarCalculos(sport);
-    });
+    $('#input-precio-wally').on('input', function() { actualizarCalculos('wally'); });
+    $('#input-precio-futsal').on('input', function() { actualizarCalculos('futsal'); });
+    $('#input-precio-voley').on('input', function() { actualizarCalculos('voley'); });
 
     function sincronizarVistaWally() {
         let canchaKey = estadoSistema.wally.canchaSeleccionada;
@@ -304,68 +153,48 @@ $(document).ready(function() {
         }
     }
 
-    // ==========================================
-    // 9. CÁLCULOS DINÁMICOS
-    // ==========================================
     function actualizarCalculos(sport) {
         let jugadores = sport === 'wally' 
             ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada].jugadores 
             : estadoSistema[sport].jugadores;
 
-        let inputVal = parseFloat($('#input-precio-' + sport).val());
-        let precioCancha = !isNaN(inputVal) && inputVal > 0 ? inputVal : (estadoSistema[sport].precioBase || 0);
-        let precioHidra = (estadoSistema[sport].hidratacion && estadoSistema[sport].hidratacion.precio) || 0;
-        let precioTotal = precioCancha + precioHidra;
-
+        let precio = parseFloat($('#input-precio-' + sport).val()) || 0;
         let totalJugadores = jugadores.length;
-        let montoTotal = precioTotal.toFixed(2);
 
+        let montoTotal = precio.toFixed(2);
         $('#monto-total-conjunto-' + sport).text(montoTotal);
         $('#total-jugadores-' + sport).text(totalJugadores);
 
-        if (totalJugadores > 0 && precioTotal > 0) {
-            let cuota = (precioTotal / totalJugadores).toFixed(2);
+        if (totalJugadores > 0 && precio > 0) {
+            let cuota = (precio / totalJugadores).toFixed(2);
             $('#cuota-persona-' + sport).text(cuota);
         } else {
             $('#cuota-persona-' + sport).text('0.00');
         }
 
         if (estadoSistema[sport].modo === 'individual') {
-            let cuotaActual = (totalJugadores > 0 && precioTotal > 0) ? (precioTotal / totalJugadores).toFixed(2) : montoTotal;
+            let cuotaActual = (totalJugadores > 0 && precio > 0) ? (precio / totalJugadores).toFixed(2) : '0.00';
             $('#monto-qr-' + sport).text(cuotaActual);
         } else {
             $('#monto-qr-' + sport).text(montoTotal);
         }
     }
 
-    // ==========================================
-    // 10. GESTIÓN DE JUGADORES
-    // ==========================================
     function agregarJugador(sport) {
         let subData = sport === 'wally' 
             ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] 
             : estadoSistema[sport];
 
-        if (subData.ocupada) { 
-            alert("❌ Cancha ocupada actualmente."); 
-            return; 
-        }
+        if (subData.ocupada) { alert("❌ Cancha ocupada."); return; }
 
-        let $input = $('#nombre-jugador-' + sport);
-        let nombre = $input.val().trim();
-        if (!nombre) {
-            $input.focus();
-            return;
-        }
+        let nombre = $('#nombre-jugador-' + sport).val().trim();
+        if (!nombre) return;
 
-        if (subData.jugadores.length >= 16) { 
-            alert("⚠️ Máximo 16 integrantes permitidos."); 
-            return; 
-        }
+        if (subData.jugadores.length >= 16) { alert("⚠️ Máximo 16 integrantes."); return; }
 
         subData.jugadores.push({ nombre: nombre, confirmado: false, pagado: false });
         renderizarLista(sport);
-        $input.val('').focus();
+        $('#nombre-jugador-' + sport).val('');
         actualizarCalculos(sport);
     }
 
@@ -376,91 +205,39 @@ $(document).ready(function() {
 
         let $lista = $('#lista-jugadores-' + sport).empty();
 
-        if (jugadores.length === 0) {
-            $lista.append('<li style="color:var(--text-muted); font-size:11px; justify-content:center;">Sin jugadores anotados</li>');
-            return;
-        }
-
         jugadores.forEach((j, i) => {
             $lista.append(`
                 <li>
-                    <span>${i + 1}. ${escapeHtml(j.nombre)}</span>
-                    <div class="player-action-btns">
-                        <button class="btn-check-asistencia spawn-balloon ${j.confirmado ? 'confirmado' : ''}" 
-                                data-sport="${sport}" data-index="${i}" 
-                                title="${j.confirmado ? 'Asistencia confirmada' : 'Pendiente asistencia'}"
-                                aria-label="Confirmar asistencia">
-                            ${j.confirmado ? '✔' : '⏳'}
-                        </button>
-                        <button class="btn-check-pago spawn-balloon ${j.pagado ? 'pagado' : ''}" 
-                                data-sport="${sport}" data-index="${i}" 
-                                title="${j.pagado ? 'Cuota pagada' : 'Pendiente de pago'}"
-                                aria-label="Confirmar pago">
-                            ${j.pagado ? '🟢' : '🔴'}
-                        </button>
-                        <button class="btn-check-asistencia btn-eliminar-jugador" 
-                                data-sport="${sport}" data-index="${i}" 
-                                title="Eliminar jugador"
-                                style="background:rgba(239, 68, 68, 0.2); color:#ef4444;"
-                                aria-label="Eliminar">
-                            ✕
-                        </button>
+                    <span>${j.nombre}</span>
+                    <div>
+                        <button class="btn-check-asistencia spawn-balloon ${j.confirmado?'confirmado':''}" data-sport="${sport}" data-index="${i}">${j.confirmado?'✔':'⏳'}</button>
+                        <button class="btn-check-pago spawn-balloon ${j.pagado?'pagado':''}" data-sport="${sport}" data-index="${i}">${j.pagado?'🟢':'🔴'}</button>
                     </div>
                 </li>
             `);
         });
     }
 
-    function escapeHtml(str) {
-        return $('<div>').text(str).html();
-    }
-
     $('#btn-anotar-wally').click(function() { agregarJugador('wally'); });
     $('#btn-anotar-futsal').click(function() { agregarJugador('futsal'); });
     $('#btn-anotar-voley').click(function() { agregarJugador('voley'); });
 
-    // Enter en input para agregar directo
-    $('#nombre-jugador-wally, #nombre-jugador-futsal, #nombre-jugador-voley').keypress(function(e) {
-        if (e.which === 13) {
-            let sport = $(this).attr('id').replace('nombre-jugador-', '');
-            agregarJugador(sport);
-        }
-    });
-
-    $(document).on('click', '.btn-check-asistencia:not(.btn-eliminar-jugador)', function() {
+    $(document).on('click', '.btn-check-asistencia', function() {
         let sport = $(this).data('sport');
         let i = $(this).data('index');
         let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
-        if (subData.jugadores[i]) {
-            subData.jugadores[i].confirmado = !subData.jugadores[i].confirmado;
-            renderizarLista(sport);
-        }
+        subData.jugadores[i].confirmado = !subData.jugadores[i].confirmado;
+        renderizarLista(sport);
     });
 
     $(document).on('click', '.btn-check-pago', function() {
         let sport = $(this).data('sport');
         let i = $(this).data('index');
         let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
-        if (subData.jugadores[i]) {
-            subData.jugadores[i].pagado = !subData.jugadores[i].pagado;
-            renderizarLista(sport);
-        }
+        subData.jugadores[i].pagado = !subData.jugadores[i].pagado;
+        renderizarLista(sport);
     });
 
-    $(document).on('click', '.btn-eliminar-jugador', function() {
-        let sport = $(this).data('sport');
-        let i = $(this).data('index');
-        let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
-        if (subData.jugadores[i]) {
-            subData.jugadores.splice(i, 1);
-            renderizarLista(sport);
-            actualizarCalculos(sport);
-        }
-    });
-
-    // ==========================================
-    // 11. TIMER DE CONFIRMACIÓN (10 MIN)
-    // ==========================================
     $('.btn-timer-mini').click(function() {
         let sport = $(this).attr('id').replace('btn-iniciar-timer-', '');
         let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
@@ -472,23 +249,17 @@ $(document).ready(function() {
         if (subData.timerConfirm) clearInterval(subData.timerConfirm);
 
         subData.timerConfirm = setInterval(() => {
-            let m = Math.floor(tiempo / 60);
-            let s = tiempo % 60;
-            $('#time-left-' + sport).text(`${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`);
+            let m = Math.floor(tiempo / 60), s = tiempo % 60;
+            $('#time-left-' + sport).text(`${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
             if (tiempo-- <= 0) {
                 clearInterval(subData.timerConfirm);
                 subData.timerConfirm = null;
                 subData.jugadores = [];
                 if (sport === 'wally') sincronizarVistaWally(); else renderizarLista(sport);
-                actualizarCalculos(sport);
-                alert("⏱️ El tiempo de confirmación de 10 minutos ha expirado.");
             }
         }, 1000);
     });
 
-    // ==========================================
-    // 12. FINALIZAR RESERVA
-    // ==========================================
     $('.btn-finalizar-reserva-mini').click(function() {
         let sport = $(this).attr('id').replace('btn-finalizar-', '');
         let subData = sport === 'wally' ? estadoSistema.wally.subCanchas[estadoSistema.wally.canchaSeleccionada] : estadoSistema[sport];
@@ -501,22 +272,15 @@ $(document).ready(function() {
 
         if (modo === 'individual') {
             if (subData.jugadores.length === 0 || !subData.jugadores.every(j => j.confirmado && j.pagado)) {
-                alert("⚠️ Todos los jugadores deben estar CONFIRMADOS y PAGADOS.");
+                alert("⚠️ Todos deben estar CONFIRMADOS y PAGADOS.");
                 return;
             }
         } else {
             let capitan = $(`#nombre-capitan-${sport}`).val().trim();
-            if (!capitan) { 
-                alert("⚠️ Ingresa el nombre del Capitán / Responsable."); 
-                $(`#nombre-capitan-${sport}`).focus();
-                return; 
-            }
+            if (!capitan) { alert("⚠️ Ingresa el nombre del Capitán."); return; }
         }
 
-        if (subData.timerConfirm) {
-            clearInterval(subData.timerConfirm);
-            subData.timerConfirm = null;
-        }
+        if (subData.timerConfirm) clearInterval(subData.timerConfirm);
 
         subData.segundosRestantes = 3600;
         subData.ocupada = true;
@@ -533,7 +297,7 @@ $(document).ready(function() {
             let m = Math.floor((subData.segundosRestantes % 3600) / 60);
             let s = subData.segundosRestantes % 60;
 
-            $('#timer-ocupado-' + sport).text(` | ⏳ ${h < 10 ? '0' : ''}${h}:${m < 10 ? '0' : ''}${m}:${s < 10 ? '0' : ''}${s}`);
+            $('#timer-ocupado-' + sport).text(` | ⏳ ${h<10?'0':''}${h}:${m<10?'0':''}${m}:${s<10?'0':''}${s}`);
 
             if (subData.segundosRestantes-- <= 0) {
                 clearInterval(subData.timerOcupado);
@@ -546,21 +310,9 @@ $(document).ready(function() {
         }, 1000);
 
         let detalle = modo === 'conjunto' ? `\nResponsable: ${$(`#nombre-capitan-${sport}`).val()}` : '';
-        let hidra = estadoSistema[sport].hidratacion;
-        let detalleHidra = hidra && hidra.precio > 0 
-            ? `\n🥤 Pack Hidratación: ${hidra.nombre} (+${hidra.precio.toFixed(2)} Bs)` 
-            : '\n🥤 Pack Hidratación: Sin pack';
-        let totalReserva = modo === 'conjunto' 
-            ? `${$(`#monto-total-conjunto-${sport}`).text()} Bs` 
-            : `${$(`#cuota-persona-${sport}`).text()} Bs / persona (${subData.jugadores.length} jugadores)`;
-
-        let nombreCancha = sport === 'wally' ? `Wally Cancha ${estadoSistema.wally.canchaSeleccionada}` : sport.toUpperCase();
-        alert(`🏆 ¡RESERVA EXITOSA! (${nombreCancha})${detalle}${detalleHidra}\nTotal: ${totalReserva}\nFecha: ${fecha} - Hora: ${hora}`);
+        alert(`🏆 ¡RESERVA EXITOSA! (${sport.toUpperCase()})${detalle}\nFecha: ${fecha} - Hora: ${hora}`);
     });
 
-    // ==========================================
-    // 13. PASARELA DE PAGO Y QR
-    // ==========================================
     $('.pay-btn-mini').click(function() {
         let sport = $(this).data('sport');
         let metodo = $(this).data('method');
@@ -572,23 +324,14 @@ $(document).ready(function() {
 
     $('.confirm-btn-mini').click(function() {
         let sport = $(this).data('sport');
-        alert("✔ Pago con QR verificado correctamente.");
+        alert("✔ Pago verificado correctamente.");
         $(`#qr-container-${sport}`).slideUp(150);
     });
-
-    // Inicializar cálculos de partida
-    actualizarCalculos('wally');
-    actualizarCalculos('futsal');
-    actualizarCalculos('voley');
 });
-
-// ==========================================
-// 14. CARRUSEL
-// ==========================================
+/* ===== CARRUSEL (JS puro, 5 imágenes por sección) ===== */
 (function () {
     document.querySelectorAll('.carousel').forEach(function (car) {
         var track = car.querySelector('.carousel-track');
-        if (!track) return;
         var imgs = (window.CAROUSEL_IMAGES || {})[car.dataset.carousel] || [];
         imgs.forEach(function (it) {
             var fig = document.createElement('figure');
@@ -596,7 +339,7 @@ $(document).ready(function() {
             var im = document.createElement('img');
             im.loading = 'lazy'; im.width = 800; im.height = 440; im.alt = it.alt;
             im.referrerPolicy = 'no-referrer';
-            im.onerror = function () { im.onerror = null; im.src = it.local; };
+            im.onerror = function () { im.onerror = null; im.src = it.local; };  // respaldo local
             im.src = it.url || it.local;
             var cap = document.createElement('figcaption');
             cap.textContent = it.alt;
@@ -607,23 +350,19 @@ $(document).ready(function() {
         var dots = car.querySelector('.carousel-dots');
         var i = 0, timer = null, startX = null;
 
-        if (dots) {
-            for (var d = 0; d < total; d++) {
-                dots.insertAdjacentHTML('beforeend', '<button data-i="' + d + '" aria-label="Imagen ' + (d + 1) + '"></button>');
-            }
+        for (var d = 0; d < total; d++) {
+            dots.insertAdjacentHTML('beforeend', '<button data-i="' + d + '" aria-label="Imagen ' + (d + 1) + '"></button>');
         }
 
         function go(n) {
-            if (total === 0) return;
             i = (n + total) % total;
             track.style.transform = 'translateX(-' + (i * 100) + '%)';
-            if (dots) {
-                dots.querySelectorAll('button').forEach(function (b, k) { b.classList.toggle('active', k === i); });
-            }
+            dots.querySelectorAll('button').forEach(function (b, k) { b.classList.toggle('active', k === i); });
         }
         function play() { stop(); timer = setInterval(function () { go(i + 1); }, 4000); }
         function stop() { if (timer) { clearInterval(timer); timer = null; } }
 
+        // Delegación de eventos: un solo listener por carrusel
         car.addEventListener('click', function (e) {
             var b = e.target.closest('button');
             if (!b) return;

@@ -1,33 +1,17 @@
 {
   "name": "DeporZone - Arena Gaming Hub",
   "short_name": "DeporZone",
-  "description": "Reserva de canchas de Wally, Futsal y Vóley en DeporZone Arena",
+  "description": "Reserva de canchas de Wally, Futsal y Vóley.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "any",
-  "background_color": "#030712",
-  "theme_color": "#030712",
+  "background_color": "#0f172a",
+  "theme_color": "#6366f1",
   "lang": "es",
-  "categories": ["sports", "productivity", "utilities"],
   "icons": [
-    {
-      "src": "icons/icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "any maskable"
-    },
-    {
-      "src": "icons/icon-maskable-512.png",
-      "sizes": "512x512",
-      "type": "image/png",
-      "purpose": "maskable"
-    }
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icons/icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
   ]
 }

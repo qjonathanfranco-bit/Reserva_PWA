@@ -1,0 +1,115 @@
+/* ==========================================================
+   Componente "Sistema de Reservas"  ·  prefijo: .reserva-
+   - Ningún selector de etiqueta suelto: todo cuelga de .reserva-*
+   - Hereda el tema de DeporZone si existe (--active-accent, etc.)
+     y usa valores por defecto si el componente va solo.
+   ========================================================== */
+
+.reserva-modulo {
+    --reserva-acento: var(--active-accent, #38bdf8);
+    --reserva-ok: #4ade80;
+    --reserva-error: #f87171;
+    --reserva-texto: var(--text-color, #f8fafc);
+    --reserva-muted: var(--text-muted, #94a3b8);
+    --reserva-fondo: var(--card-bg, rgba(15, 23, 42, 0.88));
+    --reserva-caja: var(--box-bg, rgba(30, 41, 59, 0.55));
+    --reserva-borde: var(--border-color, rgba(255, 255, 255, 0.12));
+
+    color: var(--reserva-texto);
+    font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+}
+
+.reserva-modulo__titulo { margin: 0 0 4px; font-size: 1.15rem; }
+.reserva-modulo__sub    { margin: 0 0 12px; font-size: .8rem; color: var(--reserva-muted); }
+
+.reserva-modulo__lista {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 12px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+/* ---------- Tarjeta ---------- */
+.reserva-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px;
+    background: var(--reserva-fondo);
+    border: 1px solid var(--reserva-borde);
+    border-left: 4px solid var(--reserva-acento);
+    border-radius: 12px;
+    transition: border-color .2s, box-shadow .2s, opacity .2s;
+}
+
+.reserva-card__cabecera { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.reserva-card__nombre   { margin: 0; font-size: 1rem; }
+.reserva-card__detalle  { margin: 2px 0 0; font-size: .75rem; color: var(--reserva-muted); }
+.reserva-card__precio   { font-weight: 800; white-space: nowrap; color: var(--reserva-acento); }
+
+.reserva-card__estado {
+    align-self: flex-start;
+    padding: 2px 10px;
+    border-radius: 999px;
+    font-size: .7rem;
+    font-weight: 800;
+    background: rgba(74, 222, 128, .15);
+    color: var(--reserva-ok);
+}
+
+.reserva-card__form  { display: grid; gap: 6px; margin: 0; }
+.reserva-card__campo { display: grid; gap: 2px; font-size: .7rem; color: var(--reserva-muted); }
+
+.reserva-card__input {
+    box-sizing: border-box;
+    width: 100%;
+    padding: 6px 8px;
+    font: inherit;
+    font-size: .8rem;
+    color: var(--reserva-texto);
+    background: var(--reserva-caja);
+    border: 1px solid var(--reserva-borde);
+    border-radius: 8px;
+}
+.reserva-card__input:focus-visible { outline: 2px solid var(--reserva-acento); outline-offset: 1px; }
+.reserva-card__input--invalido { border-color: var(--reserva-error); }
+
+.reserva-card__mensaje { min-height: 1.1em; margin: 0; font-size: .72rem; color: var(--reserva-error); }
+.reserva-card__mensaje--ok { color: var(--reserva-ok); }
+
+.reserva-card__acciones { display: flex; gap: 6px; flex-wrap: wrap; }
+
+.reserva-card__boton {
+    box-sizing: border-box;
+    flex: 1 1 auto;
+    padding: 7px 10px;
+    font: inherit;
+    font-size: .78rem;
+    font-weight: 800;
+    color: #0f172a;
+    background: var(--reserva-acento);
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.reserva-card__boton:hover { filter: brightness(1.1); }
+.reserva-card__boton:focus-visible { outline: 2px solid var(--reserva-texto); outline-offset: 2px; }
+.reserva-card__boton--sec {
+    color: var(--reserva-texto);
+    background: transparent;
+    border: 1px solid var(--reserva-borde);
+}
+.reserva-card__boton[hidden] { display: none; }
+
+/* ---------- Modificador de estado: reservado ---------- */
+.reserva-card--reservado {
+    border-left-color: var(--reserva-error);
+    box-shadow: 0 0 0 1px rgba(248, 113, 113, .25);
+}
+.reserva-card--reservado .reserva-card__estado {
+    background: rgba(248, 113, 113, .15);
+    color: var(--reserva-error);
+}
+.reserva-card--reservado .reserva-card__precio { color: var(--reserva-muted); }
