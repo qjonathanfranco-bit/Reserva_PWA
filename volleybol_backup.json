@@ -1,0 +1,209 @@
+{
+  "sports": [
+    {
+      "id": "wally",
+      "nombre": "WALLY ARENA",
+      "color": "#38bdf8",
+      "img": "img/vol/A.jpeg"
+    },
+    {
+      "id": "futsal",
+      "nombre": "FUTSAL PRO",
+      "color": "#4ade80",
+      "img": "img/vol/CANCHA.jpeg"
+    },
+    {
+      "id": "voley",
+      "nombre": "VÓLEY MASTER",
+      "color": "#fbbf24",
+      "img": "img/vol/CANCHA.jpeg"
+    }
+  ],
+  "canchas": [
+    {
+      "id": "A",
+      "sport_id": "wally",
+      "nombre": "CANCHA A",
+      "precio": "40.00",
+      "detalle": "Techada",
+      "estado": true,
+      "img": "img/vol/A.jpeg"
+    },
+    {
+      "id": "B",
+      "sport_id": "wally",
+      "nombre": "CANCHA B",
+      "precio": "45.00",
+      "detalle": "Blindex",
+      "estado": true,
+      "img": "img/vol/B.jpeg"
+    },
+    {
+      "id": "C",
+      "sport_id": "wally",
+      "nombre": "CANCHA C",
+      "precio": "50.00",
+      "detalle": "Pro",
+      "estado": true,
+      "img": "img/vol/C.jpeg"
+    },
+    {
+      "id": "F",
+      "sport_id": "futsal",
+      "nombre": "ARENA FUTSAL SINTÉTICA",
+      "precio": "120.00",
+      "detalle": "Iluminación LED Pro",
+      "estado": true,
+      "img": "img/vol/CANCHA.jpeg"
+    },
+    {
+      "id": "V",
+      "sport_id": "voley",
+      "nombre": "ARENA VÓLEY MASTER",
+      "precio": "80.00",
+      "detalle": "Red Ajustable Oficial",
+      "estado": true,
+      "img": "img/vol/CANCHA.jpeg"
+    }
+  ],
+  "slots": [
+    {
+      "sport_id": "wally",
+      "hora": "14:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "wally",
+      "hora": "15:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "wally",
+      "hora": "16:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "wally",
+      "hora": "18:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "wally",
+      "hora": "19:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "futsal",
+      "hora": "18:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "futsal",
+      "hora": "19:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "futsal",
+      "hora": "21:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "voley",
+      "hora": "15:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "voley",
+      "hora": "16:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "voley",
+      "hora": "17:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "voley",
+      "hora": "18:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "wally",
+      "hora": "17:00",
+      "disponible": true
+    },
+    {
+      "sport_id": "futsal",
+      "hora": "20:00",
+      "disponible": true
+    }
+  ],
+  "usuarios": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password_hash": "0a1bb3197d89313d030d68762430c7b12e25f496b035120544628f6f163aa97c",
+      "activo": true,
+      "creado_at": "2026-11-21T04:32:13.115214"
+    },
+    {
+      "id": 3,
+      "username": "prueba",
+      "password_hash": "ff960cb55673958c594d0daaab1e368651c75c02f9687192a1811e7b180336a7",
+      "activo": true,
+      "creado_at": "2026-11-21T04:35:59.648693"
+    },
+    {
+      "id": 5,
+      "username": "nuevo1",
+      "password_hash": "e3d78166623f1225b72d50490495147a62058bb9c9354276f830ef4b57797921",
+      "activo": true,
+      "creado_at": "2026-11-21T06:12:54.176630"
+    },
+    {
+      "id": 7,
+      "username": "browser1",
+      "password_hash": "9b8769a4a742959a2d0298c36fb70623f2dfacda8436237df08d8dfd5b37374c",
+      "activo": true,
+      "creado_at": "2026-11-21T06:16:12.707593"
+    },
+    {
+      "id": 11,
+      "username": "jona",
+      "password_hash": "b41b1a3935bf977bad5ec753325b4cd8d889ef0e7e7c74248b58f1c3bd0f61ac",
+      "activo": true,
+      "creado_at": "2026-11-21T06:38:45.900152"
+    }
+  ],
+  "metadatos": [
+    {
+      "key": "ano_inicio",
+      "valor": "2026"
+    },
+    {
+      "key": "ano_fin",
+      "valor": "2027"
+    },
+    {
+      "key": "app_nombre",
+      "valor": "Volleybol"
+    },
+    {
+      "key": "app_descripcion",
+      "valor": "DeporZone - Arena Gaming Hub (Wally, Futsal, Vóley)"
+    }
+  ],
+  "reservas": [
+    {
+      "id": 6,
+      "cancha_id": "A",
+      "usuario_id": 1,
+      "fecha": "2026-11-22",
+      "hora_entrada": "14:00",
+      "hora_salida": "16:00",
+      "estado": "Activa",
+      "creado_at": "2026-11-21T07:13:48.982093"
+    }
+  ],
+  "jugadores": []
+}

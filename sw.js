@@ -1,6 +1,6 @@
-const CACHE = 'deporzone-v6';
+const CACHE = 'deporzone-v18';
 const ASSETS = [
-  './', './index.html', './styles.css', './script.js', './carousel-data.js', './buscador.js', './manifest.json',
+  './', './index.html', './css/styles.css', './js/script.js', './js/carousel-data.js', './js/buscador.js', './manifest.json',
   './img/vol/A.jpeg', './img/vol/B.jpeg', './img/vol/C.jpeg', './img/vol/CANCHA.jpeg',
   './icons/icon-192.png', './icons/icon-512.png', './icons/icon-maskable-512.png',
   './img/galeria/wally-01.svg',
@@ -55,8 +55,14 @@ self.addEventListener('activate', e => {
 // Cache-first con actualización en segundo plano; fallback a index.html offline
 self.addEventListener('fetch', e => {
   if (e.request.method !== 'GET') return;
+  var u = new URL(e.request.url);
+  var h = u.hostname;
+  // La API (datos dinámicos: reservas, canchas, etc.) siempre se pide a la red
+  if (u.pathname.indexOf('/api/') === 0) {
+    e.respondWith(fetch(e.request));
+    return;
+  }
   // Fotos y APIs del buscador: siempre desde la red (no llenar el caché con respuestas opacas)
-  var h = new URL(e.request.url).hostname;
   if (h.endsWith('wikimedia.org') || h === 'www.googleapis.com' || h.endsWith('googleusercontent.com') || h.endsWith('gstatic.com') && h.startsWith('encrypted')) return;
   e.respondWith(
     caches.match(e.request).then(cached => {
